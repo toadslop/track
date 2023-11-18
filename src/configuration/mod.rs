@@ -77,8 +77,6 @@ pub fn get_configuration() -> Result<Settings, ConfigurationError> {
                 .separator(SEP),
         );
 
-    dbg!(&settings);
-
     let settings = settings.build()?;
 
     tracing::trace!("settings {:?}", settings);

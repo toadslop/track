@@ -1,0 +1,10 @@
+{
+    "rust-analyzer.cargo.cfgs": {
+        "test": "",
+        "debug": ""
+    },
+    "rust-analyzer.check.features": "all",
+    "rust-analyzer.linkedProjects": [
+        ".\\Cargo.toml"
+    ]
+}
