@@ -1,0 +1,39 @@
+[package]
+name = "track_api_challenge"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+actix-web = { version = "4.4.0", default-features = false, features = [
+    "rustls-0_21",
+    "macros",
+    "compress-brotli",
+    "compress-gzip",
+    "compress-zstd",
+] }
+anyhow = "1.0.75"
+config = "0.13.3"
+dotenv = "0.15.0"
+opentelemetry = { version = "0.21.0", default-features = false, features = [] }
+opentelemetry-jaeger = { version = "0.20.0", features = [
+    "rt-tokio-current-thread",
+] }
+opentelemetry_sdk = { version = "0.21.1", default-features = false, features = [
+    "rt-tokio-current-thread",
+] }
+serde = "1.0.192"
+thiserror = "1.0.50"
+tracing = "0.1.40"
+tracing-actix-web = "0.7.9"
+tracing-log = "0.2.0"
+tracing-opentelemetry = "0.22.0"
+tracing-subscriber = { version = "0.3.18", features = ["env-filter"] }
+
+[lib]
+path = "src/lib.rs"
+
+[[bin]]
+path = "src/main.rs"
+name = "rush_data_server_bin"
