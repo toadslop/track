@@ -7,6 +7,8 @@ async fn main() -> anyhow::Result<()> {
     init_telemetry()?;
     let config = get_configuration()?;
     let app = Application::build(config).await?;
+
+    tracing::info!("App is running on port {}", app.port());
     app.run_until_stopped().await?;
 
     Ok(())

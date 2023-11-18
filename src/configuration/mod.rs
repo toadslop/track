@@ -1,4 +1,7 @@
 use self::application::ApplicationSettings;
+use crate::configuration::{environment::Environment, error::ConfigurationError};
+use config::{Config, FileFormat};
+use dotenv::dotenv;
 use serde::Deserialize;
 
 pub mod application;
@@ -10,10 +13,6 @@ pub mod scheme;
 pub struct Settings {
     pub application: ApplicationSettings,
 }
-
-use crate::configuration::{environment::Environment, error::ConfigurationError};
-use config::Config;
-use dotenv::dotenv;
 
 const APP_ENV_KEY: &str = "ENVIRONMENT";
 const APP_ENV_PREFIX: &str = "TRACK";
@@ -62,18 +61,25 @@ pub fn get_configuration() -> Result<Settings, ConfigurationError> {
         .set_default("application.scheme", ApplicationSettings::default().scheme)?
         .set_default("application.domain", ApplicationSettings::default().domain)?
         .add_source(
+            config::File::from(configuration_directory.join(BASE_CONFIG_FILENAME))
+                .required(false)
+                .format(FileFormat::Yaml),
+        )
+        .add_source(
+            config::File::from(configuration_directory.join(environment_filename))
+                .required(false)
+                .format(FileFormat::Yaml),
+        )
+        .add_source(
             config::Environment::with_prefix(APP_ENV_PREFIX)
                 .prefix(APP_ENV_PREFIX)
                 .prefix_separator(APP_ENV_PREFIX_SEP)
                 .separator(SEP),
-        )
-        .add_source(
-            config::File::from(configuration_directory.join(BASE_CONFIG_FILENAME)).required(false),
-        )
-        .add_source(
-            config::File::from(configuration_directory.join(environment_filename)).required(false),
-        )
-        .build()?;
+        );
+
+    dbg!(&settings);
+
+    let settings = settings.build()?;
 
     tracing::trace!("settings {:?}", settings);
 

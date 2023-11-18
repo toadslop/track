@@ -20,8 +20,11 @@ impl Debug for Application {
 }
 
 impl Application {
+    #[tracing::instrument]
     pub async fn build(configuration: Settings) -> anyhow::Result<Self> {
+        tracing::debug!("Building application");
         let mut settings = configuration.application;
+        tracing::debug!("settings: {settings:?}");
         let address = format!("{}:{}", &settings.host, &settings.port);
 
         let listener = TcpListener::bind(address)?;
