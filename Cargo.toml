@@ -13,8 +13,8 @@ actix-web = { version = "4.4.0", default-features = false, features = [
     "compress-gzip",
     "compress-zstd",
 ] }
-anyhow = "1.0.75"
-config = "0.13.3"
+anyhow = { version = "1.0.75", default-features = false, features = ["std"] }
+config = { version = "0.13.3", default-features = false, features = ["yaml"] }
 dotenv = "0.15.0"
 opentelemetry = { version = "0.21.0", default-features = false, features = [] }
 opentelemetry-jaeger = { version = "0.20.0", features = [
@@ -23,7 +23,9 @@ opentelemetry-jaeger = { version = "0.20.0", features = [
 opentelemetry_sdk = { version = "0.21.1", default-features = false, features = [
     "rt-tokio-current-thread",
 ] }
-serde = "1.0.192"
+serde = { version = "1.0.192", default-features = false, features = [
+    "serde_derive",
+] }
 thiserror = "1.0.50"
 tracing = "0.1.40"
 tracing-actix-web = "0.7.9"
