@@ -10,7 +10,7 @@ pub fn criterion_benchmark(c: &mut Criterion) {
     let test_app = runtime.block_on(handle).unwrap();
 
     c.bench_function("health_check_perf", |b| {
-        b.to_async(&runtime).iter(|| test_app.get_hello_world());
+        b.to_async(&runtime).iter(|| test_app.health_check());
     });
 }
 
