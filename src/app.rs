@@ -20,7 +20,7 @@ impl Debug for Application {
 }
 
 impl Application {
-    #[tracing::instrument]
+    #[tracing::instrument(name = "build_app")]
     pub async fn build(configuration: Settings) -> anyhow::Result<Self> {
         tracing::debug!("Building application");
         let mut settings = configuration.application;

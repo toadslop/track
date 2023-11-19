@@ -1,0 +1,58 @@
+env_files = ["./.env"]
+
+[tasks.start_postgres]
+command = "docker"
+args = ["compose", "up", "postgres"]
+
+[tasks.stop_postgres]
+command = "docker"
+args = ["compose", "down", "postgres"]
+
+[tasks.start_jaeger]
+command = "docker"
+args = ["compose", "up", "jaeger"]
+
+[tasks.stop_jaeger]
+command = "docker"
+args = ["compose", "down", "jaeger"]
+
+[tasks.start_docker_all]
+command = "docker"
+args = ["compose", "up"]
+
+[tasks.stop_docker_all]
+command = "docker"
+args = ["compose", "down"]
+
+[tasks.ping_postgres]
+command = "psql"
+args = [
+    "-h",
+    "${DB_HOST}",
+    "-U",
+    "${DB_USER}",
+    "-p",
+    "${DB_PORT}",
+    "-d",
+    "${DB_NAME}",
+    "-c",
+    '\q',
+]
+
+[tasks.start_server]
+command = "cargo"
+args = ["run"]
+# cm_run_task start_postgres
+[tasks.init_db]
+script_runner = "@duckscript"
+script = '''
+set_env PGPASSWORD ${DB_PASSWORD}
+cm_run_task ping_postgres
+
+'''
+# 
+[tasks.start_all]
+run_task = { name = [
+    "start_docker_all",
+    "start_server",
+], fork = true, parallel = true }

@@ -4,7 +4,6 @@ use track_api_challenge::{app::Application, configuration, database, telemetry};
 async fn main() -> anyhow::Result<()> {
     let config = configuration::init()?;
     telemetry::init(&config.telemetry)?;
-    println!("HERE");
     database::init(&config.database).await?;
 
     let app = Application::build(config).await?;

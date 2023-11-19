@@ -1,13 +1,15 @@
+use super::error::DatabaseInitError;
 use crate::configuration::database::DatabaseSettings;
 use sqlx::migrate::MigrateDatabase;
 use sqlx::PgPool;
 use std::env;
 use std::path::Path;
+use std::time::Duration;
 
 static DATABASE_URL: &str = "DATABASE_URL";
 
-#[tracing::instrument]
-pub async fn init(settings: &DatabaseSettings) -> anyhow::Result<PgPool> {
+#[tracing::instrument(name = "init_database")]
+pub async fn init(settings: &DatabaseSettings) -> Result<PgPool, DatabaseInitError> {
     tracing::info!("Initializing database: {settings:?}");
     // Use the existing DATABASE_URL env var if exists; otherwise, use the connection string
     // from the settings file
@@ -23,6 +25,13 @@ pub async fn init(settings: &DatabaseSettings) -> anyhow::Result<PgPool> {
     };
 
     tracing::debug!(db_url);
+
+    wait_for_db_connection(
+        &db_url,
+        settings.init_wait_retry_count,
+        settings.init_wait_interval,
+    )
+    .await?;
 
     if !sqlx::Postgres::database_exists(&db_url).await? {
         tracing::trace!("Creating database");
@@ -50,4 +59,31 @@ pub async fn init(settings: &DatabaseSettings) -> anyhow::Result<PgPool> {
     tracing::info!("Migrations success");
 
     Ok(db)
+}
+
+async fn wait_for_db_connection(
+    db_url: &str,
+    max_retries: u8,
+    retry_interval: u64,
+) -> Result<(), DatabaseInitError> {
+    let mut retry_count = 0;
+    let err = loop {
+        tracing::info!("Waiting for db (count: {retry_count})");
+        match sqlx::Postgres::database_exists(db_url).await {
+            Ok(_) => {
+                tracing::info!("Connected to db");
+                return Ok(());
+            }
+            Err(e) => {
+                if retry_count >= max_retries {
+                    break e;
+                };
+                actix_web::rt::time::sleep(Duration::from_millis(retry_interval)).await
+            }
+        }
+
+        retry_count += 1;
+    };
+
+    Err(DatabaseInitError::ConnectionFailure(err))
 }

@@ -74,6 +74,14 @@ pub fn init() -> Result<Settings, ConfigurationError> {
         .set_default("database.name", DatabaseSettings::default().name)?
         .set_default("database.host", DatabaseSettings::default().host)?
         .set_default(
+            "database.init_wait_interval",
+            DatabaseSettings::default().init_wait_interval,
+        )?
+        .set_default(
+            "database.init_wait_retry_count",
+            DatabaseSettings::default().init_wait_retry_count,
+        )?
+        .set_default(
             "database.password",
             DatabaseSettings::default()
                 .password

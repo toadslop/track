@@ -8,6 +8,8 @@ pub struct DatabaseSettings {
     pub password: Secret<String>,
     pub user: String,
     pub name: String,
+    pub init_wait_interval: u64,
+    pub init_wait_retry_count: u8,
 }
 
 impl DatabaseSettings {
@@ -31,6 +33,8 @@ impl Default for DatabaseSettings {
             password: Secret::new("password".into()),
             user: "user".into(),
             name: "track".into(),
+            init_wait_interval: 1000u64,
+            init_wait_retry_count: 5,
         }
     }
 }
