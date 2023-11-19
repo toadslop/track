@@ -18,9 +18,7 @@ config = { version = "0.13.3", default-features = false, features = ["yaml"] }
 dotenv = "0.15.0"
 once_cell = "1.18.0"
 opentelemetry = { version = "0.21.0", default-features = false, features = [] }
-opentelemetry-jaeger = { version = "0.20.0", features = [
-    "rt-tokio-current-thread",
-] }
+opentelemetry-otlp = "0.14.0"
 opentelemetry_sdk = { version = "0.21.1", default-features = false, features = [
     "rt-tokio-current-thread",
 ] }

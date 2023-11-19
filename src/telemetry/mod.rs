@@ -1,6 +1,8 @@
-use opentelemetry::global;
-use opentelemetry_sdk::propagation::TraceContextPropagator;
+use opentelemetry::{global, trace, KeyValue};
+use opentelemetry_otlp::{Protocol, WithExportConfig};
 use opentelemetry_sdk::runtime::TokioCurrentThread;
+use opentelemetry_sdk::Resource;
+use opentelemetry_sdk::{propagation::TraceContextPropagator, trace::config};
 use std::io::stdout;
 use tracing_log::LogTracer;
 use tracing_subscriber::{prelude::__tracing_subscriber_SubscriberExt, EnvFilter, Registry};
@@ -11,9 +13,16 @@ pub fn init_telemetry() -> anyhow::Result<()> {
 
     global::set_text_map_propagator(TraceContextPropagator::new());
 
-    let tracer = opentelemetry_jaeger::new_agent_pipeline()
-        .with_service_name(app_name)
-        .install_batch(TokioCurrentThread)?;
+    let otlp_exporter = opentelemetry_otlp::new_exporter().tonic();
+
+    let trace_config =
+        config().with_resource(Resource::new(vec![KeyValue::new("service.name", app_name)]));
+
+    let tracer = opentelemetry_otlp::new_pipeline()
+        .tracing()
+        .with_exporter(otlp_exporter)
+        .with_trace_config(trace_config)
+        .install_simple()?;
 
     let stdout_log = tracing_subscriber::fmt::layer()
         .pretty()
