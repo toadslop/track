@@ -24,33 +24,10 @@ args = ["compose", "up"]
 command = "docker"
 args = ["compose", "down"]
 
-[tasks.ping_postgres]
-command = "psql"
-args = [
-    "-h",
-    "${DB_HOST}",
-    "-U",
-    "${DB_USER}",
-    "-p",
-    "${DB_PORT}",
-    "-d",
-    "${DB_NAME}",
-    "-c",
-    '\q',
-]
-
 [tasks.start_server]
 command = "cargo"
 args = ["run"]
-# cm_run_task start_postgres
-[tasks.init_db]
-script_runner = "@duckscript"
-script = '''
-set_env PGPASSWORD ${DB_PASSWORD}
-cm_run_task ping_postgres
 
-'''
-# 
 [tasks.start_all]
 run_task = { name = [
     "start_docker_all",
