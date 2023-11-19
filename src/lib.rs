@@ -5,6 +5,7 @@ use std::net::TcpListener;
 
 pub mod app;
 pub mod configuration;
+pub mod database;
 mod routes;
 pub mod telemetry;
 

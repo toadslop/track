@@ -1,10 +1,14 @@
 use self::{application::ApplicationSettings, jaeger::JaegerSettings};
-use crate::configuration::{environment::Environment, error::ConfigurationError};
+use crate::configuration::{
+    database::DatabaseSettings, environment::Environment, error::ConfigurationError,
+};
 use config::{Config, FileFormat};
 use dotenv::dotenv;
+use secrecy::ExposeSecret;
 use serde::Deserialize;
 
 pub mod application;
+pub mod database;
 mod environment;
 mod error;
 pub mod jaeger;
@@ -14,6 +18,7 @@ pub mod scheme;
 pub struct Settings {
     pub application: ApplicationSettings,
     pub telemetry: JaegerSettings,
+    pub database: DatabaseSettings,
 }
 
 const APP_ENV_KEY: &str = "ENVIRONMENT";
@@ -27,7 +32,7 @@ pub fn get_app_env_key() -> String {
 }
 
 #[tracing::instrument]
-pub fn get_configuration() -> Result<Settings, ConfigurationError> {
+pub fn init() -> Result<Settings, ConfigurationError> {
     tracing::debug!("Loading configuration");
 
     dotenv().ok();
@@ -65,6 +70,17 @@ pub fn get_configuration() -> Result<Settings, ConfigurationError> {
         .set_default("telemetry.port", JaegerSettings::default().port)?
         .set_default("telemetry.scheme", JaegerSettings::default().scheme)?
         .set_default("telemetry.host", JaegerSettings::default().host)?
+        .set_default("database.port", DatabaseSettings::default().port)?
+        .set_default("database.name", DatabaseSettings::default().name)?
+        .set_default("database.host", DatabaseSettings::default().host)?
+        .set_default(
+            "database.password",
+            DatabaseSettings::default()
+                .password
+                .expose_secret()
+                .as_str(),
+        )?
+        .set_default("database.user", DatabaseSettings::default().user)?
         .add_source(
             config::File::from(configuration_directory.join(BASE_CONFIG_FILENAME))
                 .required(false)

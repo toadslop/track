@@ -7,7 +7,7 @@ use std::io::stdout;
 use tracing_log::LogTracer;
 use tracing_subscriber::{prelude::__tracing_subscriber_SubscriberExt, EnvFilter, Registry};
 
-pub fn init_telemetry(settings: &JaegerSettings) -> anyhow::Result<()> {
+pub fn init(settings: &JaegerSettings) -> anyhow::Result<()> {
     LogTracer::init()?;
     let app_name = env!("CARGO_PKG_NAME");
 

@@ -1,11 +1,11 @@
-use track_api_challenge::{
-    app::Application, configuration::get_configuration, telemetry::init_telemetry,
-};
+use track_api_challenge::{app::Application, configuration, database, telemetry};
 
 #[actix_web::main]
 async fn main() -> anyhow::Result<()> {
-    let config = get_configuration()?;
-    init_telemetry(&config.telemetry)?;
+    let config = configuration::init()?;
+    telemetry::init(&config.telemetry)?;
+    println!("HERE");
+    database::init(&config.database).await?;
 
     let app = Application::build(config).await?;
 
