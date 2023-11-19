@@ -4,8 +4,9 @@ use track_api_challenge::{
 
 #[actix_web::main]
 async fn main() -> anyhow::Result<()> {
-    init_telemetry()?;
     let config = get_configuration()?;
+    init_telemetry(&config.telemetry)?;
+
     let app = Application::build(config).await?;
 
     tracing::info!("App is running on port {}", app.port());

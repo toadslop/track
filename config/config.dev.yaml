@@ -1,2 +1,6 @@
 application:
   port: 8080
+telemetry:
+  host: localhost
+  port: 4317
+  scheme: http

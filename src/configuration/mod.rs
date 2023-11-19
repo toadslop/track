@@ -1,4 +1,4 @@
-use self::application::ApplicationSettings;
+use self::{application::ApplicationSettings, jaeger::JaegerSettings};
 use crate::configuration::{environment::Environment, error::ConfigurationError};
 use config::{Config, FileFormat};
 use dotenv::dotenv;
@@ -7,11 +7,13 @@ use serde::Deserialize;
 pub mod application;
 mod environment;
 mod error;
+pub mod jaeger;
 pub mod scheme;
 
 #[derive(Debug, Deserialize)]
 pub struct Settings {
     pub application: ApplicationSettings,
+    pub telemetry: JaegerSettings,
 }
 
 const APP_ENV_KEY: &str = "ENVIRONMENT";
@@ -60,6 +62,9 @@ pub fn get_configuration() -> Result<Settings, ConfigurationError> {
         .set_default("application.host", ApplicationSettings::default().host)?
         .set_default("application.scheme", ApplicationSettings::default().scheme)?
         .set_default("application.domain", ApplicationSettings::default().domain)?
+        .set_default("telemetry.port", JaegerSettings::default().port)?
+        .set_default("telemetry.scheme", JaegerSettings::default().scheme)?
+        .set_default("telemetry.host", JaegerSettings::default().host)?
         .add_source(
             config::File::from(configuration_directory.join(BASE_CONFIG_FILENAME))
                 .required(false)
