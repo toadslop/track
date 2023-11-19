@@ -5,6 +5,7 @@
     },
     "rust-analyzer.check.features": "all",
     "rust-analyzer.linkedProjects": [
+        ".\\Cargo.toml",
         ".\\Cargo.toml"
     ]
 }
