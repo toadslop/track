@@ -17,9 +17,15 @@ impl TestApp {
 }
 
 impl TestApp {
+    const PUBLIC: &'static str = "/public";
+
     pub async fn health_check(&self) -> reqwest::Response {
         self.client
-            .get(self.app_address.join("/health_check").unwrap())
+            .get(
+                self.app_address
+                    .join(format!("{}/health_check", Self::PUBLIC).as_str())
+                    .unwrap(),
+            )
             .send()
             .await
             .expect("failed to execute request")
