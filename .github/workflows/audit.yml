@@ -1,7 +1,7 @@
 name: Security audit
 defaults:
   run:
-    working-directory: data_server_v2
+    working-directory: .
 on:
   schedule:
     - cron: '0 0 * * *'
