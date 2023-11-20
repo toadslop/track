@@ -123,6 +123,7 @@ jobs:
           POSTGRES_USER: ${{ env.TRACK__DABABASE_USER }}
           POSTGRES_PASSWORD: ${{ env.TRACK__DABABASE_PASSWORD }}
           POSTGRES_DB: ${{ env.TRACK__DABABASE_NAME }}
+          TRACK__APPLICATION_ENVIRONMENT: test
         ports:
           - 5433:5432
     steps:
