@@ -27,7 +27,7 @@ pub async fn init(settings: &DatabaseSettings) -> Result<Database, DatabaseInitE
     //     },
     // };
 
-    tracing::debug!(db_url);
+    tracing::info!(db_url);
 
     wait_for_db_connection(
         &db_url,
