@@ -1,22 +1,16 @@
-use serde_json::json;
 use track_api_challenge::domain::user::User;
+use utilities::dummy::gen_dummy_user;
 use utilities::spawn::spawn_app;
 
 #[actix_web::test]
 async fn signup_returns_200_for_valid_data() -> anyhow::Result<()> {
     // Arrange
-    let email = "test@test.com";
-    let name = "tom";
-    let password = "password";
+
     let test_app = spawn_app().await?;
-    let user_data = json!({
-        "email": email,
-        "name": name,
-        "password": password
-    });
+    let user_data = gen_dummy_user();
 
     // Act
-    let resp = test_app.signup(&user_data).await?;
+    let resp = test_app.signup(user_data.clone()).await?;
 
     // Assert
     assert_eq!(
@@ -28,6 +22,9 @@ async fn signup_returns_200_for_valid_data() -> anyhow::Result<()> {
 
     let user = resp.json::<User>().await?;
 
+    let email = user_data.get("email").unwrap().as_str().unwrap();
+    let password = user_data.get("password").unwrap().as_str().unwrap();
+    let name = user_data.get("name").unwrap().as_str().unwrap();
     assert_eq!(user.email, email);
     assert_eq!(user.password, password);
     assert_eq!(user.name, name);

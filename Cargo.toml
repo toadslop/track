@@ -60,6 +60,7 @@ criterion = { version = "0.5.1", default-features = false, features = [
     "tokio",
     "async_tokio",
 ] }
+fake = "2.9.1"
 reqwest = "0.11.22"
 tokio = "1.34.0"
 utilities = { path = "utilities" }

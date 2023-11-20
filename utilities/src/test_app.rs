@@ -38,14 +38,14 @@ impl TestApp {
         Ok(res)
     }
 
-    pub async fn signup(&self, data: &serde_json::Value) -> anyhow::Result<reqwest::Response> {
+    pub async fn signup(&self, data: serde_json::Value) -> anyhow::Result<reqwest::Response> {
         let res = self
             .client
             .post(
                 self.app_address
                     .join(format!("{}/signup", Self::PUBLIC).as_str())?,
             )
-            .json(data)
+            .json(&data)
             .send()
             .await?;
 

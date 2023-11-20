@@ -1,0 +1,8 @@
+POST http://localhost:8080/public/signup HTTP/1.1
+content-type: application/json
+
+{
+    "email": "sample",
+    "name": "Wed, 21 Oct 2015 18:27:50 GMT",
+    "password": "thing"
+}
