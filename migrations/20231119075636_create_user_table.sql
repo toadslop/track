@@ -3,5 +3,6 @@ CREATE TABLE user_ (
     PRIMARY KEY (id),
     email TEXT NOT NULL UNIQUE,
     name TEXT NOT NULL,
+    password TEXT NOT NULL,
     created_at TIMESTAMP NOT NULL
 );

@@ -6,7 +6,7 @@ async fn health_check_returns_200() -> anyhow::Result<()> {
     let test_app = spawn_app().await?;
 
     // Act
-    let resp = test_app.health_check().await;
+    let resp = test_app.health_check().await?;
 
     // Assert
     assert_eq!(

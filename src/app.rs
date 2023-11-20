@@ -1,5 +1,6 @@
 use crate::{
     configuration::{application::ApplicationSettings, Settings},
+    database::Database,
     run,
 };
 use actix_web::dev::Server;
@@ -21,7 +22,7 @@ impl Debug for Application {
 
 impl Application {
     #[tracing::instrument(name = "build_app")]
-    pub async fn build(configuration: Settings) -> anyhow::Result<Self> {
+    pub async fn build(configuration: Settings, db: Database) -> anyhow::Result<Self> {
         tracing::debug!("Building application");
         let mut settings = configuration.application;
         tracing::debug!("settings: {settings:?}");
@@ -31,7 +32,7 @@ impl Application {
         let port = listener.local_addr()?.port();
         settings.port = port;
 
-        let server = run(listener).await?;
+        let server = run(listener, db).await?;
 
         Ok(Self { settings, server })
     }

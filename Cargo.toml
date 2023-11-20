@@ -14,6 +14,7 @@ actix-web = { version = "4.4.0", default-features = false, features = [
     "compress-zstd",
 ] }
 anyhow = { version = "1.0.75", default-features = false, features = ["std"] }
+chrono = "0.4.31"
 config = { version = "0.13.3", default-features = false, features = ["yaml"] }
 dotenv = "0.15.0"
 once_cell = "1.18.0"
@@ -29,11 +30,15 @@ secrecy = { version = "0.8.0", default-features = false, features = [
 serde = { version = "1.0.192", default-features = false, features = [
     "serde_derive",
 ] }
+serde_json = { version = "1.0.108" }
 sqlx = { version = "0.7.2", default-features = false, features = [
     "postgres",
     "runtime-tokio",
     "tls-rustls",
     "migrate",
+    "uuid",
+    "macros",
+    "chrono",
 ] }
 thiserror = "1.0.50"
 tracing = "0.1.40"
@@ -41,6 +46,7 @@ tracing-actix-web = "0.7.9"
 tracing-log = "0.2.0"
 tracing-opentelemetry = "0.22.0"
 tracing-subscriber = { version = "0.3.18", features = ["env-filter"] }
+uuid = "1.6.0"
 
 [lib]
 path = "src/lib.rs"

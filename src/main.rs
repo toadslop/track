@@ -4,9 +4,9 @@ use track_api_challenge::{app::Application, configuration, database, telemetry};
 async fn main() -> anyhow::Result<()> {
     let config = configuration::init()?;
     telemetry::init(&config.telemetry)?;
-    database::init(&config.database).await?;
+    let db = database::init(&config.database).await?;
 
-    let app = Application::build(config).await?;
+    let app = Application::build(config, db).await?;
 
     tracing::info!("App is running on port {}", app.port());
     app.run_until_stopped().await?;
