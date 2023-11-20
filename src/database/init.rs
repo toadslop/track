@@ -7,25 +7,11 @@ use std::env;
 use std::path::Path;
 use std::time::Duration;
 
-static DATABASE_URL: &str = "DATABASE_URL";
-
 #[tracing::instrument(name = "init_database")]
 pub async fn init(settings: &DatabaseSettings) -> Result<Database, DatabaseInitError> {
     tracing::info!("Initializing database: {settings:?}");
-    // Use the existing DATABASE_URL env var if exists; otherwise, use the connection string
-    // from the settings file
-    env::set_var(DATABASE_URL, settings.connection_string());
-    let db_url = env::var(DATABASE_URL)?;
-    // let db_url = match env::var(DATABASE_URL) {
-    //     Ok(url) => url,
-    //     Err(e) => match e {
-    //         env::VarError::NotPresent => {
-    //             env::set_var(DATABASE_URL, settings.connection_string());
-    //             env::var(DATABASE_URL)?
-    //         }
-    //         _ => Err(e)?,
-    //     },
-    // };
+
+    let db_url = settings.connection_string();
 
     tracing::info!(db_url);
 
