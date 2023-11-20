@@ -1,18 +1,70 @@
 name: Rust
 
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    types: [ opened, synchronize, reopened ]
+    branches:
+      - master
 
 env:
   CARGO_TERM_COLOR: always
+  SQLX_VERSION: 0.7.1
+  SQLX_FEATURES: "rustls,postgres"
+  TRACK__DABABASE_USER: user
+  TRACK__DABABASE_PASSWORD: password
+  TRACK__DABABASE_NAME: track
+  TRACK__DABABASE_PORT: 5433
+  TRACK__DABABASE_HOST: localhost
 
 jobs:
   test:
     name: Test
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: ${{ env.TRACK__DABABASE_USER }}
+          POSTGRES_PASSWORD: ${{ env.TRACK__DABABASE_PASSWORD }}
+          POSTGRES_DB: ${{ env.TRACK__DABABASE_NAME }}
+        ports:
+          - 5433:5432
     steps:
-      - uses: actions/checkout@v3
-      - uses: dtolnay/rust-toolchain@stable
-      - uses: Swatinem/rust-cache@v2
+      - name: Check out repository code
+        uses: actions/checkout@v3
+
+      - name: Install the Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Rust Cache Action
+        uses: Swatinem/rust-cache@v2
+        with:
+          key: sqlx-${{ env.SQLX_VERSION }}
+
+      - name: Install cargo-make
+        run:
+            cargo install
+              --no-default-features
+              --force
+              cargo-make
+      
+      # - name: Install sqlx-cli
+      #   run:
+      #     cargo install sqlx-cli
+      #           --version=${{ env.SQLX_VERSION }}
+      #           --features ${{ env.SQLX_FEATURES }}
+      #           --no-default-features
+      #           --locked
+
+      # - name: Install postgresql-client
+      #   run: sudo apt-get update && sudo apt-get install postgresql-client -y
+
+      # - name: Migrate database
+      #   run: SKIP_DOCKER=true ./scripts/init_db.sh
+
       - name: Run tests
         run: cargo test
 
@@ -30,24 +82,66 @@ jobs:
   clippy:
     name: Clippy
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: ${{ env.TRACK__DABABASE_USER }}
+          POSTGRES_PASSWORD: ${{ env.TRACK__DABABASE_PASSWORD }}
+          POSTGRES_DB: ${{ env.TRACK__DABABASE_NAME }}
+        ports:
+          - 5433:5432
     steps:
       - uses: actions/checkout@v3
       - uses: dtolnay/rust-toolchain@stable
         with:
           components: clippy
       - uses: Swatinem/rust-cache@v2
+        with:
+          key: sqlx-${{ env.SQLX_VERSION }}
+      # - name: Install sqlx-cli
+      #   run:
+      #     cargo install sqlx-cli
+      #       --version=${{ env.SQLX_VERSION }}
+      #       --features ${{ env.SQLX_FEATURES }}
+      #       --no-default-features
+      #       --locked
+      # - name: Install postgresql-client
+      #   run: sudo apt-get update && sudo apt-get install postgresql-client -y
+      # - name: Migrate database
+      #   run: SKIP_DOCKER=true ./scripts/init_db.sh
       - name: Linting
         run: cargo clippy -- -D warnings
 
   coverage:
     name: Code coverage
     runs-on: ubuntu-latest
-    container:
-      image: xd009642/tarpaulin
-      options: --security-opt seccomp=unconfined
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: ${{ env.TRACK__DABABASE_USER }}
+          POSTGRES_PASSWORD: ${{ env.TRACK__DABABASE_PASSWORD }}
+          POSTGRES_DB: ${{ env.TRACK__DABABASE_NAME }}
+        ports:
+          - 5433:5432
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+      - uses: dtolnay/rust-toolchain@stable
+      # - name: Install postgresql-client
+      #   run: sudo apt-get update && sudo apt-get install postgresql-client -y
+      - uses: Swatinem/rust-cache@v2
+        with:
+          key: sqlx-${{ env.SQLX_VERSION }}
+      # - name: Install sqlx-cli
+      #   run:
+      #     cargo install sqlx-cli
+      #     --version=${{ env.SQLX_VERSION }}
+      #     --features ${{ env.SQLX_FEATURES }}
+      #     --no-default-features
+      #     --locked
+      # - name: Migrate database
+      #   run: SKIP_DOCKER=true ./scripts/init_db.sh
       - name: Generate code coverage
-        run: |
-          cargo tarpaulin --verbose --workspace
+        run: cargo install cargo-tarpaulin && cargo tarpaulin --verbose --workspace
