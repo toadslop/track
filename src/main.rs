@@ -1,5 +1,8 @@
+//! This application is Brian Heise's submission for the API challenge on Track.
+
 use track_api_challenge::{app::Application, configuration, database, telemetry};
 
+/// The main application binary. Launch from the root of the project using `cargo make start_all`
 #[actix_web::main]
 async fn main() -> anyhow::Result<()> {
     telemetry::init()?;

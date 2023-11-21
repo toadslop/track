@@ -8,6 +8,10 @@ use tracing_subscriber::{prelude::__tracing_subscriber_SubscriberExt, EnvFilter,
 
 static TRACK_TELEMETRY_CONNECTION_STRING: &str = "TRACK__TELEMETRY_CONNECTION_STRING";
 
+/// Initialize telemetry for the application. If the environment variable `TRACK__TELEMETRY_CONNECTION_STRING`
+/// is provided, the application will attempt to connect to a Jaeger instance. If the connection fails,
+/// the application will fail to start. If the environment variable is not set, then the application will
+/// simply output telemetr to the application logs.
 pub fn init() -> anyhow::Result<()> {
     LogTracer::init()?;
     let app_name = env!("CARGO_PKG_NAME");
