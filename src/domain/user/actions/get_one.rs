@@ -2,6 +2,7 @@ use crate::{database::Database, domain::user::User};
 use thiserror::Error;
 use uuid::Uuid;
 
+/// Action for retrieving a single user by it's ID.
 #[tracing::instrument]
 pub async fn get_one(db: &Database, user_id: &Uuid) -> Result<User, GetOneError> {
     tracing::debug!("Requesting user from db");

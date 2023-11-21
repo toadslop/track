@@ -1,3 +1,8 @@
+//! The telemtry module is responsible for collecting runtime data for the application and
+//! transmitting it where it's needed. It routes all information to stdout by default,
+//! but can also be configured by environment variable to transmit telemetry data to
+//! an Open Telemetry compatible server.
+
 use opentelemetry::{global, KeyValue};
 use opentelemetry_otlp::WithExportConfig;
 use opentelemetry_sdk::Resource;

@@ -8,6 +8,7 @@ use chrono::Utc;
 use thiserror::Error;
 use uuid::Uuid;
 
+/// Performs the necessary procedures required for signing up a new user.
 #[tracing::instrument]
 pub async fn signup(db: &Database, user_dto: &dto::Signup) -> Result<User, SignupError> {
     tracing::debug!("Hashing password");

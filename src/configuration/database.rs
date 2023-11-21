@@ -1,6 +1,7 @@
 use secrecy::{ExposeSecret, Secret};
 use serde::Deserialize;
 
+/// Settings for database configuration
 #[derive(Debug, Deserialize, Clone)]
 pub struct DatabaseSettings {
     pub port: u16,

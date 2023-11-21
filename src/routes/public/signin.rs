@@ -59,7 +59,7 @@ where
             user::actions::SigninError::JwtError(crate::auth::JwtError::InvalidCredentials(_)) => {
                 "The username and/or password submitted to not match any user in the system".into()
             }
-            _ => "An internal server error occurred".into(),
+            _ => ErrorResponse::default().message,
         };
 
         Self {

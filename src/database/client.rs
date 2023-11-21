@@ -1,6 +1,7 @@
 use sqlx::{Pool, Postgres};
 use std::ops::{Deref, DerefMut};
 
+/// A wrapper struct around a connection pool for a Postgres database.
 #[derive(Debug, Clone)]
 pub struct Database(Pool<Postgres>);
 

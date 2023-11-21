@@ -6,6 +6,8 @@ use crate::{
 use secrecy::Secret;
 use thiserror::Error;
 
+/// Carries out the necessary procedures needed to authenticate a user. It
+/// returns a valid JWT.
 #[tracing::instrument]
 pub async fn signin(
     db: &Database,

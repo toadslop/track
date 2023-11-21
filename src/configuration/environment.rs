@@ -6,6 +6,9 @@ static DEV: &str = "dev";
 static TEST: &str = "test";
 static PROD: &str = "prod";
 
+/// Enum representing the possible environments in which
+/// we may be launching the application. The app
+/// will default to production if this is not configured.
 #[derive(Debug, Deserialize, PartialEq, Clone, Copy)]
 #[serde(rename_all = "lowercase")]
 pub enum Environment {

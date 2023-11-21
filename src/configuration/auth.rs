@@ -1,6 +1,7 @@
 use secrecy::Secret;
 use serde::Deserialize;
 
+/// Settings to configure authentication
 #[derive(Debug, Deserialize, Clone)]
 pub struct AuthSettings {
     pub jwtsecret: Secret<String>,

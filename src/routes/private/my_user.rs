@@ -46,9 +46,7 @@ where
 {
     fn from(value: &user::actions::GetOneError) -> Self {
         let message = match value {
-            user::actions::GetOneError::DatabaseError(_) => {
-                "An internal server error occurred".into()
-            }
+            user::actions::GetOneError::DatabaseError(_) => ErrorResponse::default().message,
             user::actions::GetOneError::NotFound(_) => {
                 "No data was found for the requested user".into()
             }

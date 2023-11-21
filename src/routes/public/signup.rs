@@ -1,5 +1,4 @@
 use crate::database::Database;
-
 use crate::domain::user::actions::SignupError;
 use crate::domain::user::{self};
 use crate::error::ErrorResponse;
@@ -45,7 +44,7 @@ where
     fn from(value: &SignupError) -> Self {
         Self {
             status_code: value.status_code().as_u16(),
-            message: "An internal server error occured".into(),
+            message: ErrorResponse::default().message,
         }
     }
 }

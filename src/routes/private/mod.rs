@@ -1,3 +1,5 @@
+//! Responsible for all endpoints that require authentication.
+
 use crate::middleware::auth::validator;
 use actix_web::web;
 use actix_web_httpauth::middleware::HttpAuthentication;

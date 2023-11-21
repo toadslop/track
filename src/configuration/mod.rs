@@ -1,3 +1,9 @@
+//! This module defines the configuration options for the application
+//! and for initializing them on app startup. Configurations may be
+//! defined in the ./config folder or by environment variable. Note
+//! that environment variables overwrite anything defined in a config
+//! file.
+//!
 use self::application::ApplicationSettings;
 use crate::configuration::{
     auth::AuthSettings, database::DatabaseSettings, environment::Environment,

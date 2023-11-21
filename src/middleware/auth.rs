@@ -1,3 +1,5 @@
+//! Middleware for extracting a JWT from the Authentication header and validating it.
+
 use crate::auth::TokenClaims;
 use crate::configuration::auth::AuthSettings;
 use crate::error::ErrorResponse;
@@ -10,6 +12,7 @@ use jsonwebtoken::{decode, DecodingKey, Validation};
 use secrecy::ExposeSecret;
 use thiserror::Error;
 
+/// Accepts a [ServiceRequest] and [BearerAuth] and confirms the token is valid.
 #[tracing::instrument]
 pub async fn validator(
     req: ServiceRequest,
@@ -27,6 +30,7 @@ pub async fn validator(
 
     let token = creds.token();
 
+    // TODO: move decode and validate logic to the auth module
     let claims = match decode::<TokenClaims>(
         token,
         &DecodingKey::from_secret(settings.jwtsecret.expose_secret().as_ref()),

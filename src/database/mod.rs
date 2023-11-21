@@ -1,3 +1,5 @@
+//! A module for abstracting over the database connection.
+
 mod client;
 mod error;
 mod init;

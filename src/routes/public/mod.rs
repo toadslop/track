@@ -1,3 +1,5 @@
+//! Responsible for all endpoints that don't require authentication.
+
 use actix_web::web;
 mod health;
 mod signin;
