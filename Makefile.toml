@@ -28,6 +28,14 @@ args = ["compose", "down"]
 command = "cargo"
 args = ["run"]
 
+[tasks.build_docs]
+command = "cargo"
+args = ["doc"]
+
+[tasks.clean_db]
+command = "docker"
+args = ["volume", "rm", "track_postgres-data"]
+
 [tasks.start_all]
 run_task = { name = [
     "start_docker_all",
