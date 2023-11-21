@@ -1,7 +1,7 @@
 use super::{environment::Environment, scheme::Scheme};
 use serde::Deserialize;
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone)]
 pub struct ApplicationSettings {
     pub port: u16,
     pub host: String,

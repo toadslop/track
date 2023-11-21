@@ -32,7 +32,7 @@ impl Application {
         let port = listener.local_addr()?.port();
         settings.port = port;
 
-        let server = run(listener, db).await?;
+        let server = run(listener, db, configuration.auth).await?;
 
         Ok(Self { settings, server })
     }

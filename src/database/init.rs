@@ -9,11 +9,9 @@ use std::time::Duration;
 
 #[tracing::instrument(name = "init_database")]
 pub async fn init(settings: &DatabaseSettings) -> Result<Database, DatabaseInitError> {
-    tracing::info!("Initializing database: {settings:?}");
+    tracing::info!("Initializing database with settings: {settings:?}");
 
     let db_url = settings.connection_string();
-
-    tracing::info!(db_url);
 
     wait_for_db_connection(
         &db_url,

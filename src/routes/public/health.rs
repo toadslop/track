@@ -1,7 +1,7 @@
-use actix_web::{get, HttpResponse, Responder};
+use actix_web::HttpResponse;
 
 // TODO: convert to same as signup function
-#[get("/health_check")]
-pub async fn health_check() -> impl Responder {
-    HttpResponse::Ok()
+#[tracing::instrument]
+pub async fn health_check() -> HttpResponse {
+    HttpResponse::Ok().finish()
 }

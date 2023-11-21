@@ -4,7 +4,7 @@ use std::fmt::Display;
 static HTTP: &str = "http";
 static HTTPS: &str = "https";
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone, Copy)]
 #[serde(rename_all = "lowercase")]
 pub enum Scheme {
     Http,

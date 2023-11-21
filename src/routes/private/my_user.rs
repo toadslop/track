@@ -1,18 +1,18 @@
 use crate::database::Database;
-use crate::domain::user::{CreateUserDto, UserError};
 use crate::routes::error::ErrorResponse;
 use actix_web::http::StatusCode;
 use actix_web::{web, HttpResponse, ResponseError};
 use thiserror::Error;
+use uuid::Uuid;
 
 #[tracing::instrument]
-pub async fn signup(
-    user_data: web::Json<CreateUserDto>,
+pub async fn my_user(
     db: web::Data<Database>,
-) -> Result<HttpResponse, SignupError> {
-    tracing::info!("Signup requested: {user_data:?}");
+    user_id: web::ReqData<Uuid>,
+) -> Result<HttpResponse, GetUserError> {
+    // tracing::info!("Signup requested: {user_data:?}");
 
-    match db.insert_user(&user_data.into_inner()).await {
+    match db.get_user(&user_id.into_inner()).await {
         Ok(user) => {
             tracing::info!("Signup success: {user:?}");
             Ok(HttpResponse::Ok().json(user))
@@ -25,15 +25,15 @@ pub async fn signup(
 }
 
 #[derive(Debug, Error)]
-pub enum SignupError {
+pub enum GetUserError {
     #[error("Failed to persist the user: {0}")]
-    PersistanceError(#[from] UserError),
+    PersistanceError(#[from] sqlx::Error),
 }
 
-impl ResponseError for SignupError {
+impl ResponseError for GetUserError {
     fn status_code(&self) -> StatusCode {
         match self {
-            SignupError::PersistanceError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            GetUserError::PersistanceError(_) => StatusCode::INTERNAL_SERVER_ERROR,
         }
     }
 
@@ -45,13 +45,13 @@ impl ResponseError for SignupError {
     }
 }
 
-impl From<&SignupError> for ErrorResponse
+impl From<&GetUserError> for ErrorResponse
 where
-    SignupError: ResponseError,
+    GetUserError: ResponseError,
 {
-    fn from(value: &SignupError) -> Self {
+    fn from(value: &GetUserError) -> Self {
         match value {
-            SignupError::PersistanceError(_) => Self {
+            GetUserError::PersistanceError(_) => Self {
                 status_code: value.status_code().as_u16(),
                 message: value.to_string(),
             },

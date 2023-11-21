@@ -1,8 +1,32 @@
+POST https://track-submission.onrender.com/public/signup HTTP/1.1
+content-type: application/json
+
+{
+    "email": "sample@bob.com",
+    "name": "bob",
+    "password": "thing"
+}
+
+###
 POST http://localhost:8080/public/signup HTTP/1.1
 content-type: application/json
 
 {
-    "email": "sample",
-    "name": "Wed, 21 Oct 2015 18:27:50 GMT",
+    "email": "sample2s322@bob.com",
+    "name": "bob",
+    "password": "thing"
+}
+
+###
+GET http://localhost:8080/private/my_user HTTP/1.1
+content-type: application/json
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI0NTNlZTgyZC01NjA0LTQzZTktYTk0Ni0zOTZmZWNmZDIxOWEiLCJpYXQiOjE3MDA1MzQxMzEsImV4cCI6MTcwMDUzNzczMX0.8mvDcKYHTS8_jsMPNDA-DZqsasLmb-A1KkMwCZpPONA
+
+###
+POST http://localhost:8080/public/signin HTTP/1.1
+content-type: application/json
+
+{
+    "email": "sample2s322@bob.com",
     "password": "thing"
 }

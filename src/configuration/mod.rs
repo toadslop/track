@@ -1,6 +1,7 @@
-use self::{application::ApplicationSettings, jaeger::JaegerSettings};
+use self::application::ApplicationSettings;
 use crate::configuration::{
-    database::DatabaseSettings, environment::Environment, error::ConfigurationError,
+    auth::AuthSettings, database::DatabaseSettings, environment::Environment,
+    error::ConfigurationError,
 };
 use config::{Config, FileFormat};
 use dotenv::dotenv;
@@ -8,17 +9,17 @@ use secrecy::ExposeSecret;
 use serde::Deserialize;
 
 pub mod application;
+pub mod auth;
 pub mod database;
 mod environment;
 mod error;
-pub mod jaeger;
 pub mod scheme;
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone)]
 pub struct Settings {
     pub application: ApplicationSettings,
-    pub telemetry: JaegerSettings,
     pub database: DatabaseSettings,
+    pub auth: AuthSettings,
 }
 
 const APP_ENV_KEY: &str = "ENVIRONMENT";
@@ -33,15 +34,15 @@ pub fn get_app_env_key() -> String {
 
 #[tracing::instrument]
 pub fn init() -> Result<Settings, ConfigurationError> {
-    tracing::debug!("Loading configuration");
+    tracing::info!("Loading configuration");
 
     dotenv().ok();
 
     let base_path = std::env::current_dir().map_err(ConfigurationError::CurDirNotFound)?;
-    tracing::trace!("base path: {:?}", base_path);
+    tracing::debug!("base path: {:?}", base_path);
 
     let configuration_directory = base_path.join(CONFIG_DIR_NAME);
-    tracing::trace!("config directory: {:?}", configuration_directory);
+    tracing::debug!("config directory: {:?}", configuration_directory);
 
     let app_env_key = get_app_env_key();
 
@@ -56,20 +57,17 @@ pub fn init() -> Result<Settings, ConfigurationError> {
         },
     };
 
-    tracing::trace!("App environment: {environment}");
+    tracing::info!("App environment: {environment}");
 
     let environment_filename = format!("config.{}.yaml", environment.as_ref());
 
-    tracing::trace!("Environment filename: {environment_filename}");
+    tracing::debug!("Environment filename: {environment_filename}");
 
     let settings = Config::builder()
         .set_default("application.port", ApplicationSettings::default().port)?
         .set_default("application.host", ApplicationSettings::default().host)?
         .set_default("application.scheme", ApplicationSettings::default().scheme)?
         .set_default("application.domain", ApplicationSettings::default().domain)?
-        .set_default("telemetry.port", JaegerSettings::default().port)?
-        .set_default("telemetry.scheme", JaegerSettings::default().scheme)?
-        .set_default("telemetry.host", JaegerSettings::default().host)?
         .set_default("database.port", DatabaseSettings::default().port)?
         .set_default("database.name", DatabaseSettings::default().name)?
         .set_default("database.host", DatabaseSettings::default().host)?
@@ -89,6 +87,11 @@ pub fn init() -> Result<Settings, ConfigurationError> {
                 .as_str(),
         )?
         .set_default("database.user", DatabaseSettings::default().user)?
+        .set_default("auth.jwt_max_age", AuthSettings::default().jwt_max_age)?
+        .set_default(
+            "auth.jwt_expires_in",
+            AuthSettings::default().jwt_expires_in,
+        )? // Note: we don't allow a default for the secret for security reasons
         .add_source(
             config::File::from(configuration_directory.join(BASE_CONFIG_FILENAME))
                 .required(false)
@@ -108,11 +111,11 @@ pub fn init() -> Result<Settings, ConfigurationError> {
 
     let settings = settings.build()?;
 
-    tracing::trace!("settings {:?}", settings);
+    tracing::info!("Loaded with settings {:?}", settings);
 
     let settings = settings.try_deserialize::<Settings>()?;
 
-    tracing::debug!("Configuration loaded");
+    tracing::info!("Configuration load successful");
 
     Ok(settings)
 }

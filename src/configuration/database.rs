@@ -1,7 +1,7 @@
 use secrecy::{ExposeSecret, Secret};
 use serde::Deserialize;
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone)]
 pub struct DatabaseSettings {
     pub port: u16,
     pub host: String,
