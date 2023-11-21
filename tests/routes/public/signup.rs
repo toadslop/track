@@ -1,4 +1,3 @@
-use argon2::password_hash::PasswordHashString;
 use argon2::{Argon2, PasswordHash, PasswordVerifier};
 use track_api_challenge::domain::user::User;
 use utilities::dummy::gen_dummy_user;
