@@ -2,6 +2,7 @@
 //! sharing between the main binary, the integration tests, and the benchmark suite.
 
 pub mod app;
+pub mod auth;
 pub mod configuration;
 pub mod database;
 pub mod domain;

@@ -30,7 +30,11 @@ impl ResponseError for user::actions::SigninError {
     fn status_code(&self) -> StatusCode {
         match self {
             user::actions::SigninError::UserNotFound => StatusCode::BAD_REQUEST,
-            user::actions::SigninError::InvalidCredentials(_) => StatusCode::UNAUTHORIZED,
+            user::actions::SigninError::JwtError(source) => match source {
+                crate::auth::JwtError::PasswordHash(_) => StatusCode::INTERNAL_SERVER_ERROR,
+                crate::auth::JwtError::InvalidCredentials(_) => StatusCode::UNAUTHORIZED,
+                _ => StatusCode::INTERNAL_SERVER_ERROR,
+            },
             _ => StatusCode::INTERNAL_SERVER_ERROR,
         }
     }
@@ -52,7 +56,7 @@ where
             user::actions::SigninError::UserNotFound => {
                 "User for submitted credentials does not exist".into()
             }
-            user::actions::SigninError::InvalidCredentials(_) => {
+            user::actions::SigninError::JwtError(crate::auth::JwtError::InvalidCredentials(_)) => {
                 "The username and/or password submitted to not match any user in the system".into()
             }
             _ => "An internal server error occurred".into(),

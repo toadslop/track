@@ -1,3 +1,4 @@
+use crate::auth::TokenClaims;
 use crate::configuration::auth::AuthSettings;
 use crate::error::ErrorResponse;
 use actix_web::dev::ServiceRequest;
@@ -7,15 +8,7 @@ use actix_web::{HttpResponse, ResponseError};
 use actix_web_httpauth::extractors::bearer::BearerAuth;
 use jsonwebtoken::{decode, DecodingKey, Validation};
 use secrecy::ExposeSecret;
-use serde::{Deserialize, Serialize};
 use thiserror::Error;
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct TokenClaims {
-    pub sub: String,
-    pub iat: usize,
-    pub exp: usize,
-}
 
 #[tracing::instrument]
 pub async fn validator(

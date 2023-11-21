@@ -1,14 +1,10 @@
-use argon2::{password_hash, Argon2, PasswordHash, PasswordVerifier};
-use chrono::{Duration, Utc};
-use jsonwebtoken::{encode, EncodingKey, Header};
-use secrecy::{ExposeSecret, Secret};
-use thiserror::Error;
-
 use crate::{
+    auth::{issue_jwt, verify_jwt, JwtError},
     database::Database,
     domain::user::{dto, User},
-    middleware::auth::TokenClaims,
 };
+use secrecy::Secret;
+use thiserror::Error;
 
 #[tracing::instrument]
 pub async fn signin(
@@ -27,32 +23,9 @@ pub async fn signin(
         .ok_or(SigninError::UserNotFound)?;
     tracing::debug!("User found");
 
-    tracing::debug!("Generating has from db user's password");
-    let hash = PasswordHash::new(&user.password).map_err(SigninError::PasswordHash)?;
-    tracing::debug!("Success");
+    verify_jwt(&user.password, &user_info.password)?;
 
-    tracing::debug!("Verifying password...");
-    Argon2::default()
-        .verify_password(user_info.password.expose_secret().as_bytes(), &hash)
-        .map_err(SigninError::InvalidCredentials)?;
-    tracing::debug!("Verifying password...");
-
-    let now = Utc::now();
-    let iat = now.timestamp() as usize;
-    let exp = (now + Duration::minutes(60)).timestamp() as usize;
-    let claims: TokenClaims = TokenClaims {
-        sub: user.id.to_string(),
-        exp,
-        iat,
-    };
-
-    tracing::debug!("Encoding JWT...");
-    let token = encode(
-        &Header::default(),
-        &claims,
-        &EncodingKey::from_secret(jwt_secret.expose_secret().as_ref()),
-    )?;
-    tracing::debug!("Encoding success");
+    let token = issue_jwt(&user.id, jwt_secret)?;
 
     Ok(token)
 }
@@ -61,12 +34,8 @@ pub async fn signin(
 pub enum SigninError {
     #[error("No user with the provided password and email combination was found")]
     UserNotFound,
-    #[error("Failed to hash password")]
-    PasswordHash(password_hash::Error),
     #[error("Error when persisting user: {0}")]
     DatabaseError(#[from] sqlx::Error),
-    #[error("Failed to encode the jwt")]
-    JwtError(#[from] jsonwebtoken::errors::Error),
-    #[error("User attempted to signin with invalid credentials")]
-    InvalidCredentials(argon2::password_hash::Error),
+    #[error("Error occurred when preparing JWT: {0}")]
+    JwtError(#[from] JwtError),
 }

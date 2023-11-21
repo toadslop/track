@@ -1,27 +1,17 @@
 use crate::{
+    auth::hash_password,
     database::Database,
     domain::user::{dto, User},
 };
-use argon2::{
-    password_hash::{self, rand_core::OsRng, SaltString},
-    Argon2, PasswordHasher,
-};
+use argon2::password_hash::{self};
 use chrono::Utc;
-use secrecy::ExposeSecret;
 use thiserror::Error;
 use uuid::Uuid;
 
 #[tracing::instrument]
 pub async fn signup(db: &Database, user_dto: &dto::Signup) -> Result<User, SignupError> {
-    tracing::debug!("Generating salt");
-    let salt = SaltString::generate(&mut OsRng);
-
     tracing::debug!("Hashing password");
-    let hashed_password = Argon2::default()
-        .hash_password(user_dto.password.expose_secret().as_bytes(), &salt)
-        .map_err(SignupError::PasswordHash)?
-        .to_string();
-
+    let hashed_password = hash_password(&user_dto.password).map_err(SignupError::PasswordHash)?;
     tracing::debug!("Password hash success");
 
     tracing::debug!("Inserting user into DB");
