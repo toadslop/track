@@ -531,9 +531,7 @@ checksum = "7f2c685bad3eb3d45a01354cedb7d5faa66194d1d58ba6e267a8de788f79db38"
 dependencies = [
  "android-tzdata",
  "iana-time-zone",
- "js-sys",
  "num-traits",
- "wasm-bindgen",
  "windows-targets",
 ]
 
@@ -1063,12 +1061,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6fb8d784f27acf97159b40fc4db5ecd8aa23b9ad5ef69cdd136d3bc80665f0c0"
 
 [[package]]
-name = "glob"
-version = "0.3.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d2fabcfbdc87f4758337ca535fb41a6d701b65693ce38287d856d1674551ec9b"
-
-[[package]]
 name = "h2"
 version = "0.3.22"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1374,31 +1366,9 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "155c4d7e39ad04c172c5e3a99c434ea3b4a7ba7960b38ecd562b270b097cce09"
 dependencies = [
  "base64",
- "pem",
  "ring",
  "serde",
  "serde_json",
- "simple_asn1",
-]
-
-[[package]]
-name = "jwt-compact"
-version = "0.8.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "25cb2458ca54de48ef237ac0d68d4e80e512ae81d6aeb9775f4c835da0d193d3"
-dependencies = [
- "anyhow",
- "base64ct",
- "chrono",
- "ciborium",
- "hmac",
- "rand_core",
- "serde",
- "serde_json",
- "sha2",
- "smallvec",
- "subtle",
- "zeroize",
 ]
 
 [[package]]
@@ -1593,17 +1563,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "num-bigint"
-version = "0.4.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "608e7659b5c3d7cba262d894801b9ec9d00de989e8a82bd4bef91d08da45cdc0"
-dependencies = [
- "autocfg",
- "num-integer",
- "num-traits",
-]
-
-[[package]]
 name = "num-bigint-dig"
 version = "0.8.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1783,7 +1742,6 @@ dependencies = [
  "futures-channel",
  "futures-executor",
  "futures-util",
- "glob",
  "once_cell",
  "opentelemetry",
  "ordered-float",
@@ -1854,16 +1812,6 @@ name = "pathdiff"
 version = "0.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8835116a5c179084a830efb3adc117ab007512b535bc1a21c991d3b32a6b44dd"
-
-[[package]]
-name = "pem"
-version = "3.0.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3163d2912b7c3b52d651a055f2c7eec9ba5cd22d26ef75b8dd3a59980b185923"
-dependencies = [
- "base64",
- "serde",
-]
 
 [[package]]
 name = "pem-rfc7468"
@@ -2382,18 +2330,6 @@ checksum = "77549399552de45a898a580c1b41d445bf730df867cc44e6c0233bbc4b8329de"
 dependencies = [
  "digest",
  "rand_core",
-]
-
-[[package]]
-name = "simple_asn1"
-version = "0.6.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "adc4e5204eb1910f40f9cfa375f6f05b68c3abac4b6fd879c8ff5e7ae8a0a085"
-dependencies = [
- "num-bigint",
- "num-traits",
- "thiserror",
- "time",
 ]
 
 [[package]]
@@ -3047,10 +2983,8 @@ dependencies = [
  "once_cell",
  "opentelemetry",
  "opentelemetry_sdk",
- "smallvec",
  "tracing",
  "tracing-core",
- "tracing-log",
  "tracing-subscriber",
  "web-time",
 ]
@@ -3087,7 +3021,6 @@ dependencies = [
  "dotenv",
  "fake",
  "jsonwebtoken",
- "jwt-compact",
  "once_cell",
  "opentelemetry",
  "opentelemetry-otlp",
@@ -3501,20 +3434,6 @@ name = "zeroize"
 version = "1.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "525b4ec142c6b68a2d10f01f7bbf6755599ca3f81ea53b8431b7dd348f5fdb2d"
-dependencies = [
- "zeroize_derive",
-]
-
-[[package]]
-name = "zeroize_derive"
-version = "1.4.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ce36e65b0d2999d2aafac989fb249189a141aee1f53c612c1f37d72631959f69"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn 2.0.39",
-]
 
 [[package]]
 name = "zstd"

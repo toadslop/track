@@ -13,17 +13,22 @@ actix-web = { version = "4.4.0", default-features = false, features = [
     "compress-gzip",
     "compress-zstd",
 ] }
-actix-web-httpauth = "0.8.1"
+actix-web-httpauth = { version = "0.8.1", default-features = false }
 anyhow = { version = "1.0.75", default-features = false, features = ["std"] }
-argon2 = "0.5.2"
-chrono = "0.4.31"
+argon2 = { version = "0.5.2", default-features = false, features = [
+    "password-hash",
+    "alloc",
+] }
+chrono = { version = "0.4.31", default-features = false }
 config = { version = "0.13.3", default-features = false, features = ["yaml"] }
-dotenv = "0.15.0"
-jsonwebtoken = "9.1.0"
-jwt-compact = "0.8.0"
-once_cell = "1.18.0"
+dotenv = { version = "0.15.0", default-features = false }
+jsonwebtoken = { version = "9.1.0", default-features = false }
+once_cell = { version = "1.18.0", default-features = false }
 opentelemetry = { version = "0.21.0", default-features = false, features = [] }
-opentelemetry-otlp = "0.14.0"
+opentelemetry-otlp = { version = "0.14.0", default-features = false, features = [
+    "grpc-tonic",
+    "trace",
+] }
 opentelemetry_sdk = { version = "0.21.1", default-features = false, features = [
     "rt-tokio-current-thread",
 ] }
@@ -34,7 +39,7 @@ secrecy = { version = "0.8.0", default-features = false, features = [
 serde = { version = "1.0.192", default-features = false, features = [
     "serde_derive",
 ] }
-serde_json = { version = "1.0.108" }
+serde_json = { version = "1.0.108", default-features = false }
 sqlx = { version = "0.7.2", default-features = false, features = [
     "postgres",
     "runtime-tokio",
@@ -45,13 +50,13 @@ sqlx = { version = "0.7.2", default-features = false, features = [
     "chrono",
     "json",
 ] }
-thiserror = "1.0.50"
-tracing = "0.1.40"
-tracing-actix-web = "0.7.9"
-tracing-log = "0.2.0"
-tracing-opentelemetry = "0.22.0"
+thiserror = { version = "1.0.50", default-features = false }
+tracing = { version = "0.1.40", default-features = false }
+tracing-actix-web = { version = "0.7.9", default-features = false }
+tracing-log = { version = "0.2.0", default-features = false }
+tracing-opentelemetry = { version = "0.22.0", default-features = false }
 tracing-subscriber = { version = "0.3.18", features = ["env-filter"] }
-uuid = { version = "1.6.0", features = ["serde"] }
+uuid = { version = "1.6.0", default-features = false, features = ["serde"] }
 
 [lib]
 path = "src/lib.rs"
