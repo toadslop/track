@@ -1,3 +1,5 @@
+use argon2::password_hash::PasswordHashString;
+use argon2::{Argon2, PasswordHash, PasswordVerifier};
 use track_api_challenge::domain::user::User;
 use utilities::dummy::gen_dummy_user;
 use utilities::spawn::spawn_app;
@@ -21,12 +23,15 @@ async fn signup_returns_200_for_valid_data() -> anyhow::Result<()> {
     );
 
     let user = resp.json::<User>().await?;
+    let hash = PasswordHash::new(&user.password).unwrap();
 
     let email = user_data.get("email").unwrap().as_str().unwrap();
     let password = user_data.get("password").unwrap().as_str().unwrap();
     let name = user_data.get("name").unwrap().as_str().unwrap();
     assert_eq!(user.email, email);
-    assert_eq!(user.password, password);
+    assert!(Argon2::default()
+        .verify_password(password.as_bytes(), &hash)
+        .is_ok());
     assert_eq!(user.name, name);
 
     Ok(())

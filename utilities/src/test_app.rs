@@ -1,4 +1,4 @@
-use anyhow::Ok;
+use crate::dummy::gen_dummy_user;
 use serde_json;
 use track_api_challenge::database::Database;
 
@@ -50,6 +50,25 @@ impl TestApp {
             .await?;
 
         Ok(res)
+    }
+
+    pub async fn signin(&self, data: serde_json::Value) -> anyhow::Result<reqwest::Response> {
+        let res = self
+            .client
+            .post(
+                self.app_address
+                    .join(format!("{}/signin", Self::PUBLIC).as_str())?,
+            )
+            .json(&data)
+            .send()
+            .await?;
+
+        Ok(res)
+    }
+
+    pub async fn create_and_signup_user(&self) -> anyhow::Result<reqwest::Response> {
+        let user_data = gen_dummy_user();
+        Ok(self.signup(user_data).await?)
     }
 
     pub fn db(&mut self) -> &mut Database {

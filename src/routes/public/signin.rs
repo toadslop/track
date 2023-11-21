@@ -4,6 +4,7 @@ use crate::domain::user::{LoginUserDto, UserError};
 use crate::routes::error::ErrorResponse;
 use actix_web::http::StatusCode;
 use actix_web::{web, HttpResponse, ResponseError};
+use serde_json::json;
 use thiserror::Error;
 
 #[tracing::instrument]
@@ -20,7 +21,7 @@ pub async fn signin(
     {
         Ok(jwt) => {
             tracing::info!("Signin success: {jwt:?}");
-            Ok(HttpResponse::Ok().json(jwt))
+            Ok(HttpResponse::Ok().json(json!({"token": jwt})))
         }
         Err(e) => {
             tracing::error!("Signin Failure: {e}");
