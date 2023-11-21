@@ -15,28 +15,27 @@ use std::time::Duration;
 ///
 /// Configuration options are as follows:
 ///
-/// ```
-/// port
-/// host
-/// password
-/// user
-/// name
-/// init_wait_interval
-/// init_wait_retry_count
-/// ```
+///
+/// `port`
+/// `host`
+/// `password`
+/// `user`
+/// `name`
+/// `init_wait_interval`
+/// `init_wait_retry_count`
+///
 ///
 /// Note that, for local development, environment variables should be used to configure
 /// the port, host, password, user, and name of the database as these need to be
 /// initialized when the database docker container starts up. Create a .env file
 /// and add the values as follows:
 ///
-/// ```
-/// TRACK__DATABASE_USER=user
-/// TRACK__DATABASE_PASSWORD=password
-/// TRACK__DATABASE_NAME=track
-/// TRACK__DATABASE_PORT=5433
-/// TRACK__DATABASE_HOST=localhost
-/// ```
+///
+/// `TRACK__DATABASE_USER=user`
+/// `TRACK__DATABASE_PASSWORD=password`
+/// `TRACK__DATABASE_NAME=track`
+/// `TRACK__DATABASE_PORT=5433`
+/// `TRACK__DATABASE_HOST=localhost`
 ///
 #[tracing::instrument(name = "init_database")]
 pub async fn init(settings: &DatabaseSettings) -> Result<Database, DatabaseInitError> {

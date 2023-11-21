@@ -10,3 +10,9 @@ pub mod error;
 mod middleware;
 mod routes;
 pub mod telemetry;
+
+// Deps rexported so the utilities package can use them
+pub use actix_web;
+pub use anyhow;
+pub use once_cell;
+pub use uuid;

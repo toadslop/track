@@ -2,10 +2,24 @@ POST https://track-submission.onrender.com/public/signup HTTP/1.1
 content-type: application/json
 
 {
-    "email": "sample@bob.com",
+    "email": "sample2@bob.com",
     "name": "bob",
     "password": "thing"
 }
+
+###
+POST https://track-submission.onrender.com/public/signin HTTP/1.1
+content-type: application/json
+
+{
+    "email": "sample2@bob.com",
+    "password": "thing"
+}
+
+###
+GET https://track-submission.onrender.com/private/my_user HTTP/1.1
+content-type: application/json
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJjYzI3ZjIzNi0yN2Y1LTRmMGYtYjlhNC01YzA1OGZhOTU4ZDkiLCJpYXQiOjE3MDA1MzgxOTMsImV4cCI6MTcwMDU0MTc5M30.7II1iFGYGhA-XIbg6KsUKcWSBUhYvI7nYH7qJoQ524I
 
 ###
 POST http://localhost:8080/public/signup HTTP/1.1

@@ -171,7 +171,6 @@ dependencies = [
  "bytes",
  "bytestring",
  "cfg-if",
- "cookie",
  "derive_more",
  "encoding_rs",
  "futures-core",
@@ -612,17 +611,6 @@ name = "convert_case"
 version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6245d59a3e82a7fc217c5828a6692dbc6dfb63a0c8c90495621f7b9d79704a0e"
-
-[[package]]
-name = "cookie"
-version = "0.16.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e859cd57d0710d9e06c381b550c06e76992472a8c6d527aecd2fc673dcc231fb"
-dependencies = [
- "percent-encoding",
- "time",
- "version_check",
-]
 
 [[package]]
 name = "core-foundation"
@@ -3019,19 +3007,16 @@ dependencies = [
  "config",
  "criterion",
  "dotenv",
- "fake",
  "jsonwebtoken",
  "once_cell",
  "opentelemetry",
  "opentelemetry-otlp",
  "opentelemetry_sdk",
- "reqwest",
  "secrecy",
  "serde",
  "serde_json",
  "sqlx",
  "thiserror",
- "tokio",
  "tracing",
  "tracing-actix-web",
  "tracing-log",
@@ -3113,15 +3098,10 @@ checksum = "daf8dba3b7eb870caf1ddeed7bc9d2a049f3cfdfae7cb521b087cc33ae4c49da"
 name = "utilities"
 version = "0.1.0"
 dependencies = [
- "actix-web",
- "anyhow",
  "fake",
- "once_cell",
  "reqwest",
  "serde_json",
- "sqlx",
  "track_api_challenge",
- "uuid",
 ]
 
 [[package]]

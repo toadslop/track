@@ -1,11 +1,12 @@
 use super::{telemetry::TRACING, test_app::TestApp};
-use actix_web::rt::spawn;
-use once_cell::sync::Lazy;
 use std::env;
+use track_api_challenge::actix_web::rt::spawn;
+use track_api_challenge::anyhow;
 use track_api_challenge::app::Application;
 use track_api_challenge::configuration::{self, get_app_env_key};
 use track_api_challenge::database;
-use uuid::Uuid;
+use track_api_challenge::once_cell::sync::Lazy;
+use track_api_challenge::uuid::Uuid;
 
 pub async fn spawn_app() -> anyhow::Result<TestApp> {
     env::set_var(get_app_env_key(), "test");

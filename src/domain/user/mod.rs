@@ -13,6 +13,7 @@ pub struct User {
     pub id: Uuid,
 }
 
+// TODO: add domain validations to email/password/etc
 // TODO: add the rest of the database fields
 // TODO: create a DTO for returning user data with requests and use
 // it in the actions/routes

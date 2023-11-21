@@ -2,18 +2,14 @@
 name = "utilities"
 version = "0.1.0"
 edition = "2021"
+description = "A set of test utilities that are shared between integration tests and benchmarks"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-actix-web = "4.4.0"
-anyhow = "1.0.75"
-once_cell = "1.18.0"
 reqwest = { version = "0.11.22", features = ["json"] }
 serde_json = "1.0.108"
-sqlx = "0.7.2"
 track_api_challenge = { path = "../" }
-uuid = "1.6.0"
 fake = "2.9.1"
 
 [dev-dependencies]
