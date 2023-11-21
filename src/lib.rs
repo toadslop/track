@@ -5,6 +5,7 @@ pub mod app;
 pub mod configuration;
 pub mod database;
 pub mod domain;
+pub mod error;
 mod middleware;
 mod routes;
 pub mod telemetry;

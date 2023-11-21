@@ -28,9 +28,12 @@ impl Application {
     #[tracing::instrument(name = "build_app")]
     pub async fn build(configuration: Settings, db: Database) -> anyhow::Result<Self> {
         tracing::debug!("Building application");
+
         let mut settings = configuration.application;
         tracing::debug!("settings: {settings:?}");
+
         let address = format!("{}:{}", &settings.host, &settings.port);
+        tracing::debug!("app address: {address}");
 
         let listener = TcpListener::bind(address)?;
         let port = listener.local_addr()?.port();

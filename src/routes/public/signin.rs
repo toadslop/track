@@ -1,61 +1,37 @@
 use crate::configuration::auth::AuthSettings;
 use crate::database::Database;
-use crate::domain::user::{LoginUserDto, UserError};
-use crate::routes::error::ErrorResponse;
+use crate::domain::user::{self};
+use crate::error::ErrorResponse;
 use actix_web::http::StatusCode;
 use actix_web::{web, HttpResponse, ResponseError};
 use serde_json::json;
-use thiserror::Error;
 
 #[tracing::instrument]
 pub async fn signin(
-    user_data: web::Json<LoginUserDto>,
+    user_data: web::Json<user::dto::Signin>,
     settings: web::Data<AuthSettings>,
     db: web::Data<Database>,
-) -> Result<HttpResponse, SignupError> {
+) -> Result<HttpResponse, user::actions::SigninError> {
     tracing::info!("Signin requested: {user_data:?}");
 
-    match db
-        .signin_user(&user_data.into_inner(), &settings.jwtsecret)
-        .await
-    {
+    match user::actions::signin(&db, &user_data.into_inner(), &settings.jwtsecret).await {
         Ok(jwt) => {
             tracing::info!("Signin success: {jwt:?}");
             Ok(HttpResponse::Ok().json(json!({"token": jwt})))
         }
         Err(e) => {
             tracing::error!("Signin Failure: {e}");
-            return Err(e.into());
+            return Err(e);
         }
     }
 }
 
-#[derive(Debug, Error)]
-pub enum SignupError {
-    #[error("Failed to persist the user: {0}")]
-    PersistanceError(#[from] UserError),
-}
-
-impl ResponseError for SignupError {
+impl ResponseError for user::actions::SigninError {
     fn status_code(&self) -> StatusCode {
         match self {
-            SignupError::PersistanceError(source) => match source {
-                UserError::PasswordHashError(source) => match source {
-                    argon2::password_hash::Error::ParamNameDuplicated => StatusCode::BAD_REQUEST,
-                    argon2::password_hash::Error::ParamNameInvalid => StatusCode::BAD_REQUEST,
-                    argon2::password_hash::Error::ParamValueInvalid(_) => StatusCode::BAD_REQUEST,
-                    argon2::password_hash::Error::ParamsMaxExceeded => StatusCode::BAD_REQUEST,
-                    argon2::password_hash::Error::Password => StatusCode::BAD_REQUEST,
-                    _ => StatusCode::BAD_REQUEST,
-                },
-                UserError::SqlxError(source) => match source {
-                    sqlx::Error::RowNotFound => StatusCode::BAD_REQUEST,
-                    _ => StatusCode::INTERNAL_SERVER_ERROR,
-                },
-                UserError::UserNotFound => StatusCode::BAD_REQUEST,
-                UserError::InvalidCredentials(_) => StatusCode::BAD_REQUEST,
-                UserError::JwtError(_) => StatusCode::BAD_REQUEST,
-            },
+            user::actions::SigninError::UserNotFound => StatusCode::BAD_REQUEST,
+            user::actions::SigninError::InvalidCredentials(_) => StatusCode::UNAUTHORIZED,
+            _ => StatusCode::INTERNAL_SERVER_ERROR,
         }
     }
 
@@ -67,22 +43,24 @@ impl ResponseError for SignupError {
     }
 }
 
-impl From<&SignupError> for ErrorResponse
+impl From<&user::actions::SigninError> for ErrorResponse
 where
-    SignupError: ResponseError,
+    user::actions::SigninError: ResponseError,
 {
-    fn from(value: &SignupError) -> Self {
-        match value {
-            SignupError::PersistanceError(_) => Self {
-                status_code: value.status_code().as_u16(),
-                message: {
-                    if value.status_code().as_u16() != 500 {
-                        value.to_string()
-                    } else {
-                        "An internal server error occurred".into()
-                    }
-                },
-            },
+    fn from(value: &user::actions::SigninError) -> Self {
+        let message = match value {
+            user::actions::SigninError::UserNotFound => {
+                "User for submitted credentials does not exist".into()
+            }
+            user::actions::SigninError::InvalidCredentials(_) => {
+                "The username and/or password submitted to not match any user in the system".into()
+            }
+            _ => "An internal server error occurred".into(),
+        };
+
+        Self {
+            status_code: value.status_code().as_u16(),
+            message,
         }
     }
 }

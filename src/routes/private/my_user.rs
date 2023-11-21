@@ -1,39 +1,34 @@
 use crate::database::Database;
-use crate::routes::error::ErrorResponse;
+use crate::domain::user;
+use crate::error::ErrorResponse;
 use actix_web::http::StatusCode;
 use actix_web::{web, HttpResponse, ResponseError};
-use thiserror::Error;
 use uuid::Uuid;
 
 #[tracing::instrument]
 pub async fn my_user(
     db: web::Data<Database>,
     user_id: web::ReqData<Uuid>,
-) -> Result<HttpResponse, GetUserError> {
-    // tracing::info!("Signup requested: {user_data:?}");
+) -> Result<HttpResponse, user::actions::GetOneError> {
+    tracing::info!("User info requested for user: {:?}", &user_id.as_ref());
 
-    match db.get_user(&user_id.into_inner()).await {
+    match user::actions::get_one(&db, &user_id.into_inner()).await {
         Ok(user) => {
-            tracing::info!("Signup success: {user:?}");
+            tracing::info!("Request success: {user:?}");
             Ok(HttpResponse::Ok().json(user))
         }
         Err(e) => {
-            tracing::error!("Failed to persist user: {e}");
-            return Err(e.into());
+            tracing::error!("Request failure: {e}");
+            return Err(e);
         }
     }
 }
 
-#[derive(Debug, Error)]
-pub enum GetUserError {
-    #[error("Failed to persist the user: {0}")]
-    PersistanceError(#[from] sqlx::Error),
-}
-
-impl ResponseError for GetUserError {
+impl ResponseError for user::actions::GetOneError {
     fn status_code(&self) -> StatusCode {
         match self {
-            GetUserError::PersistanceError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            user::actions::GetOneError::DatabaseError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            user::actions::GetOneError::NotFound(_) => StatusCode::BAD_REQUEST,
         }
     }
 
@@ -45,16 +40,23 @@ impl ResponseError for GetUserError {
     }
 }
 
-impl From<&GetUserError> for ErrorResponse
+impl From<&user::actions::GetOneError> for ErrorResponse
 where
-    GetUserError: ResponseError,
+    user::actions::GetOneError: ResponseError,
 {
-    fn from(value: &GetUserError) -> Self {
-        match value {
-            GetUserError::PersistanceError(_) => Self {
-                status_code: value.status_code().as_u16(),
-                message: value.to_string(),
-            },
+    fn from(value: &user::actions::GetOneError) -> Self {
+        let message = match value {
+            user::actions::GetOneError::DatabaseError(_) => {
+                "An internal server error occurred".into()
+            }
+            user::actions::GetOneError::NotFound(_) => {
+                "No data was found for the requested user".into()
+            }
+        };
+
+        Self {
+            status_code: value.status_code().as_u16(),
+            message,
         }
     }
 }

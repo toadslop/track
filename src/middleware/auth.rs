@@ -1,5 +1,5 @@
 use crate::configuration::auth::AuthSettings;
-use crate::routes::error::ErrorResponse;
+use crate::error::ErrorResponse;
 use actix_web::dev::ServiceRequest;
 use actix_web::http::StatusCode;
 use actix_web::{web, HttpMessage};
