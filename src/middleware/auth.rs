@@ -63,7 +63,7 @@ pub enum AuthError {
     InvalidToken(#[from] jsonwebtoken::errors::Error),
     #[error("Token is invalid")]
     InvalidCredentials,
-    #[error("Encountered an error in the database")]
+    #[error("Encountered an error in the database: {0}")]
     DatabaseError(#[from] sqlx::Error),
     #[error("Failed to extract the database")]
     DatabaseExtractFailure(#[from] actix_web::Error),
@@ -108,10 +108,12 @@ where
     }
 }
 
+#[tracing::instrument]
 pub async fn process_basic(
     mut req: ServiceRequest,
     credentials: Option<BasicAuth>,
 ) -> Result<ServiceRequest, (actix_web::Error, ServiceRequest)> {
+    tracing::info!("Requesting signin with basic auth");
     let db = match req.extract::<web::Data<Database>>().await.map_err(|e| {
         let error: AuthError = AuthError::DatabaseExtractFailure(e);
         tracing::error!("{}", &error);
@@ -137,7 +139,10 @@ pub async fn process_basic(
     .map_err(AuthError::DatabaseError)
     {
         Ok(user) => user,
-        Err(e) => return Err((e.into(), req)),
+        Err(e) => {
+            tracing::error!("Failed to retrieve user info: {e}");
+            return Err((e.into(), req));
+        }
     };
 
     let user = match user.ok_or(AuthError::InvalidCredentials) {

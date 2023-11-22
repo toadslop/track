@@ -87,6 +87,7 @@ impl Application {
         self.server.await
     }
 
+    /// Initialize custom configuration for custom error messages
     fn init_json_config() -> JsonConfig {
         web::JsonConfig::default().error_handler(|err, req| {
             let error = match err {

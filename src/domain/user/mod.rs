@@ -10,7 +10,8 @@ pub struct User {
     pub user_id: String,
     pub password: String,
     pub id: Uuid,
-    pub nickname: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub nickname: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub comment: Option<String>,
 }

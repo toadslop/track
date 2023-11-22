@@ -1,6 +1,9 @@
 use super::error::DatabaseInitError;
 use super::Database;
 use crate::configuration::database::DatabaseSettings;
+use crate::domain::user::actions::signup;
+use crate::domain::user::dto::Signup;
+use secrecy::Secret;
 use sqlx::migrate::MigrateDatabase;
 use sqlx::PgPool;
 use std::env;
@@ -75,6 +78,17 @@ pub async fn init(settings: &DatabaseSettings) -> Result<Database, DatabaseInitE
         .await?;
     tracing::info!("Migrations success");
     let db: Database = Database::from(db);
+
+    signup(
+        &db,
+        &Signup {
+            user_id: "TaroYamada".into(),
+            password: Secret::new("PaSSwd4TY".into()),
+        },
+    )
+    .await
+    .expect("Failed to create test user");
+
     Ok(db)
 }
 
