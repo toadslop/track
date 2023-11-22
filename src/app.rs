@@ -92,7 +92,6 @@ impl Application {
             let error = match err {
                 actix_web::error::JsonPayloadError::Deserialize(e) => {
                     if req.path().ends_with("/signup") {
-                        println!("HERE");
                         InternalError::from_response(
                             e,
                             HttpResponse::BadRequest()

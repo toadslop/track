@@ -107,12 +107,17 @@ where
 
 pub async fn process_basic(
     mut req: ServiceRequest,
-    credentials: BasicAuth,
+    credentials: Option<BasicAuth>,
 ) -> Result<ServiceRequest, (actix_web::Error, ServiceRequest)> {
     let db = req
         .extract::<web::Data<Database>>()
         .await
         .expect("TODO: handle error correctly");
+
+    let credentials = match credentials {
+        Some(credentials) => credentials,
+        None => return Err((AuthError::InvalidCredentials.into(), req)),
+    };
 
     let user = match sqlx::query_as::<_, User>(
         r#"
