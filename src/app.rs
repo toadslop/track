@@ -1,7 +1,7 @@
 use crate::{
     configuration::{application::ApplicationSettings, auth::AuthSettings, Settings},
     database::Database,
-    domain::user::actions::{SigninError, SignupError},
+    domain::user::actions::SignupError,
     error::ErrorResponse,
     routes::{private::private_services, public::public_services},
 };
