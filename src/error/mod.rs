@@ -6,14 +6,15 @@ use serde::Serialize;
 /// the application. It defaults to an internal server error.
 #[derive(Debug, Serialize)]
 pub struct ErrorResponse {
-    pub cause: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub cause: Option<String>,
     pub message: String,
 }
 
 impl Default for ErrorResponse {
     fn default() -> Self {
         Self {
-            cause: "Unknown".into(),
+            cause: None,
             message: "An internal server error occurred".into(),
         }
     }

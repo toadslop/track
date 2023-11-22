@@ -84,7 +84,7 @@ where
         match value {
             AuthError::MissingConfig => ErrorResponse::default(),
             AuthError::InvalidToken(..) => Self {
-                cause: value.to_string(),
+                cause: Some(value.to_string()),
                 message: "Authentication failures".into(),
             },
         }

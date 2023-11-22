@@ -54,12 +54,15 @@ where
     fn from(value: &user::actions::SigninError) -> Self {
         let cause = match value {
             user::actions::SigninError::UserNotFound => {
-                "User for submitted credentials does not exist".into()
+                Some("User for submitted credentials does not exist".into())
             }
             user::actions::SigninError::JwtError(crate::auth::JwtError::InvalidCredentials(_)) => {
-                "The username and/or password submitted to not match any user in the system".into()
+                Some(
+                    "The username and/or password submitted to not match any user in the system"
+                        .into(),
+                )
             }
-            _ => ErrorResponse::default().message,
+            _ => ErrorResponse::default().cause,
         };
 
         Self {

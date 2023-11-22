@@ -46,15 +46,13 @@ where
 {
     fn from(value: &user::actions::GetOneError) -> Self {
         let cause = match value {
-            user::actions::GetOneError::DatabaseError(_) => ErrorResponse::default().message,
-            user::actions::GetOneError::NotFound(_) => {
-                "No data was found for the requested user".into()
-            }
+            user::actions::GetOneError::DatabaseError(_) => ErrorResponse::default().cause,
+            user::actions::GetOneError::NotFound(_) => None,
         };
 
         Self {
             cause,
-            message: "Failed to retrieve user information".into(),
+            message: "No User found".into(),
         }
     }
 }
