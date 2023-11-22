@@ -44,6 +44,15 @@ impl From<User> for GetUserResponse {
     }
 }
 
+/// User submitted data for modifying their account
+#[derive(Debug, Deserialize)]
+pub struct UpdateUserDto {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub nickname: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub comment: Option<String>,
+}
+
 /// User submitted data used for signing in.
 #[derive(Debug, Deserialize)]
 pub struct Signin {
