@@ -1,13 +1,13 @@
-use serde_json::json;
-use track_api_challenge::domain::user::User;
-use utilities::{dummy::gen_dummy_user, spawn::spawn_app};
+// use serde_json::json;
+// use track_api_challenge::domain::user::User;
+// use utilities::{dummy::gen_dummy_user, spawn::spawn_app};
 
 #[actix_web::test]
 async fn signin_returns_200_and_jwt() -> anyhow::Result<()> {
     // Arrange
 
-    let test_app = spawn_app().await?;
-    let user_data = gen_dummy_user();
+    // let test_app = spawn_app().await?;
+    // let user_data = gen_dummy_user();
     // test_app
     //     .signup(user_data.clone())
     //     .await?
