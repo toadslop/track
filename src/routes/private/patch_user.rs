@@ -13,8 +13,9 @@ pub async fn patch_user(
     match user::actions::update_user(&db, &user_id, &update_user).await {
         Ok(user) => {
             tracing::info!("Request success: {user:?}");
+            let users = vec![user];
             Ok(HttpResponse::Ok()
-                .json(serde_json::json!({"message": "User details by user_id", "user": user})))
+                .json(serde_json::json!({"message": "User successfully updated", "recipe": users})))
         }
         Err(e) => {
             tracing::error!("Request failure: {e}");

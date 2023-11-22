@@ -3,7 +3,6 @@ use std::fmt::Display;
 use crate::{
     database::Database,
     domain::user::{
-        actions::get_one,
         dto::{GetUserResponse, UpdateUserDto},
         User,
     },
@@ -17,32 +16,38 @@ pub async fn update_user(
     db: &Database,
     user_id: &str,
     update_user: &UpdateUserDto,
-) -> Result<User, GetOneError> {
-    tracing::debug!("Requesting user from db");
+) -> Result<GetUserResponse, GetOneError> {
+    tracing::debug!("Updating user: {:?}", update_user);
     sqlx::query(
         r#"
         UPDATE user_
             SET
                 nickname = COALESCE($1, nickname),
-                comment = COALESCE($2, comment),
+                comment = COALESCE($2, comment)
             WHERE user_id = $3;
     "#,
     )
     .bind(&update_user.nickname)
     .bind(&update_user.comment)
     .bind(user_id)
-    .fetch_one(db.inner())
+    .execute(db.inner())
     .await?;
 
-    let user = get_one_by_str_id(db, user_id).await?;
+    tracing::debug!("Requesting user from db");
+    let user = sqlx::query_as::<_, User>(
+        r#"
+        SELECT * FROM user_ WHERE user_id = $1
+    "#,
+    )
+    .bind(user_id)
+    .fetch_optional(db.inner())
+    .await?
+    .ok_or(GetOneError::NotFound(UserIdType::Str(user_id.to_owned())))?;
 
-    // .await?
-    // .ok_or(GetOneError::NotFound(UserIdType::Uuid(*user_id)))?;
-
-    tracing::debug!("User found");
-    // dbg!(user);
-    todo!();
-    // Ok(user)
+    tracing::debug!("User found: {:?}", user);
+    let mut user: GetUserResponse = user.into();
+    user.user_id = None;
+    Ok(user)
 }
 
 /// Action for retrieving a single user by it's ID.

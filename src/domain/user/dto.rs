@@ -28,7 +28,8 @@ impl From<User> for SignupResponse {
 /// User submitted data for signing up
 #[derive(Debug, Serialize)]
 pub struct GetUserResponse {
-    pub user_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub user_id: Option<String>,
     pub nickname: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub comment: Option<String>,
@@ -37,7 +38,7 @@ pub struct GetUserResponse {
 impl From<User> for GetUserResponse {
     fn from(value: User) -> Self {
         Self {
-            user_id: value.user_id.clone(),
+            user_id: Some(value.user_id.clone()),
             nickname: value.user_id,
             comment: value.comment,
         }
