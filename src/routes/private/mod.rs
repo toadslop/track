@@ -1,8 +1,6 @@
 //! Responsible for all endpoints that require authentication.
 
-use crate::{
-    auth::verify_password, database::Database, domain::user::User, middleware::auth::validator,
-};
+use crate::{auth::verify_password, database::Database, domain::user::User};
 use actix_web::{dev::ServiceRequest, web};
 use actix_web_httpauth::{extractors::basic::BasicAuth, middleware::HttpAuthentication};
 use secrecy::Secret;

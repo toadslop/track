@@ -1,9 +1,6 @@
 use crate::database::Database;
 use crate::domain::user;
-use crate::error::ErrorResponse;
-use actix_web::http::StatusCode;
-use actix_web::{web, HttpResponse, ResponseError};
-use uuid::Uuid;
+use actix_web::{web, HttpResponse};
 
 #[tracing::instrument]
 pub async fn get_user(
