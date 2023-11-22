@@ -65,15 +65,16 @@ pub enum AuthError {
     InvalidCredentials,
     #[error("Encountered an error in the database")]
     DatabaseError(#[from] sqlx::Error),
+    #[error("Failed to extract the database")]
+    DatabaseExtractFailure(#[from] actix_web::Error),
 }
 
 impl ResponseError for AuthError {
     fn status_code(&self) -> StatusCode {
         match self {
-            AuthError::MissingConfig => StatusCode::INTERNAL_SERVER_ERROR,
             AuthError::InvalidToken(_) => StatusCode::UNAUTHORIZED,
             AuthError::InvalidCredentials => StatusCode::UNAUTHORIZED,
-            AuthError::DatabaseError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            _ => StatusCode::INTERNAL_SERVER_ERROR,
         }
     }
 
@@ -91,16 +92,18 @@ where
 {
     fn from(value: &AuthError) -> Self {
         match value {
-            AuthError::MissingConfig => ErrorResponse::default(),
             AuthError::InvalidToken(..) => Self {
                 cause: Some(value.to_string()),
-                message: "Authentication failures".into(),
+                message: "Authentication Failed".into(),
             },
             AuthError::InvalidCredentials => Self {
                 cause: None,
                 message: "Authentication Failed".into(),
             },
-            AuthError::DatabaseError(_) => todo!(),
+            _ => Self {
+                cause: None,
+                message: Self::default().message,
+            },
         }
     }
 }
@@ -109,10 +112,14 @@ pub async fn process_basic(
     mut req: ServiceRequest,
     credentials: Option<BasicAuth>,
 ) -> Result<ServiceRequest, (actix_web::Error, ServiceRequest)> {
-    let db = req
-        .extract::<web::Data<Database>>()
-        .await
-        .expect("TODO: handle error correctly");
+    let db = match req.extract::<web::Data<Database>>().await.map_err(|e| {
+        let error: AuthError = AuthError::DatabaseExtractFailure(e);
+        tracing::error!("{}", &error);
+        error
+    }) {
+        Ok(db) => db,
+        Err(e) => return Err((e.into(), req)),
+    };
 
     let credentials = match credentials {
         Some(credentials) => credentials,
@@ -138,12 +145,16 @@ pub async fn process_basic(
         Err(e) => return Err((e.into(), req)),
     };
 
-    let submitted_password = credentials
-        .password()
-        .expect("SHOULD HAVE PASSWORD")
-        .to_string();
+    let submitted_password = match credentials.password() {
+        Some(credentials) => credentials,
+        None => return Err((AuthError::InvalidCredentials.into(), req)),
+    }
+    .into();
 
-    verify_password(&user.password, &Secret::new(submitted_password)).expect("TODO");
+    if let Err(e) = verify_password(&user.password, &Secret::new(submitted_password)) {
+        tracing::error!("Password verification failed: {e}");
+        return Err((AuthError::InvalidCredentials.into(), req));
+    }
 
     Ok(req)
 }
