@@ -49,6 +49,7 @@ where
     fn from(value: &SignupError) -> Self {
         let cause = match value {
             SignupError::InvalidPayload => "required user_id and password".into(),
+            SignupError::UserAlreadyExists(..) => "already same user_id is used".into(),
             _ => ErrorResponse::default().cause,
         };
 

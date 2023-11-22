@@ -14,6 +14,15 @@ use uuid::Uuid;
 /// Performs the necessary procedures required for signing up a new user.
 #[tracing::instrument]
 pub async fn signup(db: &Database, user_dto: &dto::Signup) -> Result<SignupResponse, SignupError> {
+    let user = sqlx::query_as::<_, User>("SELECT * FROM user_ WHERE user_id = $1")
+        .bind(&user_dto.user_id)
+        .fetch_optional(db.inner())
+        .await?;
+
+    if user.is_some() {
+        return Err(SignupError::UserAlreadyExists(user_dto.user_id.clone()));
+    }
+
     tracing::debug!("Hashing password");
     let hashed_password = hash_password(&user_dto.password).map_err(SignupError::PasswordHash)?;
     tracing::debug!("Password hash success");
@@ -53,4 +62,6 @@ pub enum SignupError {
     JwtError(#[from] jsonwebtoken::errors::Error),
     #[error("Invalid payload received")]
     InvalidPayload,
+    #[error("A user with id {0} already exists")]
+    UserAlreadyExists(String),
 }
