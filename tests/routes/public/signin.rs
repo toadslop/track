@@ -14,9 +14,9 @@ async fn signin_returns_200_and_jwt() -> anyhow::Result<()> {
         .json::<User>()
         .await?;
 
-    let email = user_data.get("email").unwrap().as_str().unwrap();
+    let user_id = user_data.get("user_id").unwrap().as_str().unwrap();
     let password = user_data.get("password").unwrap().as_str().unwrap();
-    let signin_data = json!({"email": email, "password": password});
+    let signin_data = json!({"user_id": user_id, "password": password});
 
     // Act
     let resp = test_app.signin(signin_data).await?;

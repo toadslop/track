@@ -7,8 +7,7 @@ pub mod dto;
 /// Represents a user as stored in the database.
 #[derive(Debug, Serialize, Deserialize, sqlx::FromRow, Clone)]
 pub struct User {
-    pub name: String,
-    pub email: String,
+    pub user_id: String,
     pub password: String,
     pub id: Uuid,
 }

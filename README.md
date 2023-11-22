@@ -66,7 +66,7 @@ This may seem redundent, but it's necessary for [sqlx](https://github.com/launch
 ## Commands
 
 * `cargo make start_all`: starts Postgres and Jaeger using Docker and builds and launches the application. The app may timeout waiting for the postgres docker image to build if you're launching for the first time. If this happens, shut down the application and try again.
-* `cargo make build_docs`: build the application documentation. You will be able to view the documentation [here](./target/doc/rush_data_server_bin/index.html)
+* `cargo make build_docs`: build the application documentation. You will be able to view the documentation [here](./target/doc/rush_data_server_bin/index.html). Since this is a raw html file, I recommend opening it in your browser.
 * `cargo make stop_docker_all`: ensure that docker containers are shut down cleanly
 * `cargo make clean_db`: delete all data from the database.
 * `cargo test`: run tests

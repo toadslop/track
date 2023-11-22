@@ -1,3 +1,8 @@
 target
 .env
 postgres-data
+.track
+test
+env.yml
+package.json
+node_modules

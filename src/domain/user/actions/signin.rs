@@ -15,11 +15,11 @@ pub async fn signin(
     jwt_secret: &Secret<String>,
 ) -> Result<String, SigninError> {
     tracing::debug!(
-        "Requesting user from db where email is {}",
-        &user_info.email
+        "Requesting user from db where user_id is {}",
+        &user_info.user_id
     );
-    let user = sqlx::query_as::<_, User>("SELECT * FROM user_ WHERE email = $1")
-        .bind(&user_info.email)
+    let user = sqlx::query_as::<_, User>("SELECT * FROM user_ WHERE user_id = $1")
+        .bind(&user_info.user_id)
         .fetch_optional(db.inner())
         .await?
         .ok_or(SigninError::UserNotFound)?;

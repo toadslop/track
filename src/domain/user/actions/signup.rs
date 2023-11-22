@@ -18,13 +18,12 @@ pub async fn signup(db: &Database, user_dto: &dto::Signup) -> Result<User, Signu
     tracing::debug!("Inserting user into DB");
     sqlx::query(
         r#"
-        INSERT INTO user_ (id, email, name, password, created_at)
-        VALUES($1, $2, $3, $4, $5)
+        INSERT INTO user_ (id, user_id, password, created_at)
+        VALUES($1, $2, $3, $4)
     "#,
     )
     .bind(Uuid::new_v4())
-    .bind(&user_dto.email)
-    .bind(&user_dto.name)
+    .bind(&user_dto.user_id)
     .bind(hashed_password)
     .bind(Utc::now())
     .execute(db.inner())
@@ -32,8 +31,8 @@ pub async fn signup(db: &Database, user_dto: &dto::Signup) -> Result<User, Signu
     tracing::debug!("Insert user success");
 
     tracing::debug!("Retrieving user info from DB");
-    let user = sqlx::query_as::<_, User>("SELECT * FROM user_ WHERE email = $1")
-        .bind(&user_dto.email)
+    let user = sqlx::query_as::<_, User>("SELECT * FROM user_ WHERE user_id = $1")
+        .bind(&user_dto.user_id)
         .fetch_one(db.inner())
         .await?;
     tracing::debug!("Retrieval success");
