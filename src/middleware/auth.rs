@@ -82,13 +82,10 @@ where
 {
     fn from(value: &AuthError) -> Self {
         match value {
-            AuthError::MissingConfig => Self {
-                status_code: value.status_code().as_u16(),
-                message: "Internal server error".into(),
-            },
+            AuthError::MissingConfig => ErrorResponse::default(),
             AuthError::InvalidToken(..) => Self {
-                status_code: value.status_code().as_u16(),
-                message: value.to_string(),
+                cause: value.to_string(),
+                message: "Authentication failures".into(),
             },
         }
     }

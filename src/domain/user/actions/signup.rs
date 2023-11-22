@@ -1,7 +1,10 @@
 use crate::{
     auth::hash_password,
     database::Database,
-    domain::user::{dto, User},
+    domain::user::{
+        dto::{self, SignupResponse},
+        User,
+    },
 };
 use argon2::password_hash::{self};
 use chrono::Utc;
@@ -10,7 +13,7 @@ use uuid::Uuid;
 
 /// Performs the necessary procedures required for signing up a new user.
 #[tracing::instrument]
-pub async fn signup(db: &Database, user_dto: &dto::Signup) -> Result<User, SignupError> {
+pub async fn signup(db: &Database, user_dto: &dto::Signup) -> Result<SignupResponse, SignupError> {
     tracing::debug!("Hashing password");
     let hashed_password = hash_password(&user_dto.password).map_err(SignupError::PasswordHash)?;
     tracing::debug!("Password hash success");
@@ -37,7 +40,7 @@ pub async fn signup(db: &Database, user_dto: &dto::Signup) -> Result<User, Signu
         .await?;
     tracing::debug!("Retrieval success");
 
-    Ok(user)
+    Ok(user.into())
 }
 
 #[derive(Debug, Error)]
@@ -48,4 +51,6 @@ pub enum SignupError {
     DatabaseError(#[from] sqlx::Error),
     #[error("Failed to encode the jwt")]
     JwtError(#[from] jsonwebtoken::errors::Error),
+    #[error("Invalid payload received")]
+    InvalidPayload,
 }

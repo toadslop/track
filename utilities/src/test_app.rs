@@ -24,15 +24,10 @@ impl TestApp {
 }
 
 impl TestApp {
-    const PUBLIC: &'static str = "/public";
-
     pub async fn health_check(&self) -> anyhow::Result<reqwest::Response> {
         let res = self
             .client
-            .get(
-                self.app_address
-                    .join(format!("{}/health_check", Self::PUBLIC).as_str())?,
-            )
+            .get(self.app_address.join("/health_check")?)
             .send()
             .await?;
 
@@ -42,10 +37,7 @@ impl TestApp {
     pub async fn signup(&self, data: serde_json::Value) -> anyhow::Result<reqwest::Response> {
         let res = self
             .client
-            .post(
-                self.app_address
-                    .join(format!("{}/signup", Self::PUBLIC).as_str())?,
-            )
+            .post(self.app_address.join("/signup")?)
             .json(&data)
             .send()
             .await?;
@@ -56,10 +48,7 @@ impl TestApp {
     pub async fn signin(&self, data: serde_json::Value) -> anyhow::Result<reqwest::Response> {
         let res = self
             .client
-            .post(
-                self.app_address
-                    .join(format!("{}/signin", Self::PUBLIC).as_str())?,
-            )
+            .post(self.app_address.join("/signin")?)
             .json(&data)
             .send()
             .await?;

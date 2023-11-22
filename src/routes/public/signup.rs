@@ -15,7 +15,9 @@ pub async fn signup(
     match user::actions::signup(&db, &user_data.into_inner()).await {
         Ok(user) => {
             tracing::info!("Signup success: {user:?}");
-            Ok(HttpResponse::Ok().json(user))
+
+            Ok(HttpResponse::Ok()
+                .json(serde_json::json!({"message": "Account successfully created", "user": user})))
         }
         Err(e) => {
             tracing::error!("Failed to persist user: {e}");
@@ -26,7 +28,10 @@ pub async fn signup(
 
 impl ResponseError for SignupError {
     fn status_code(&self) -> StatusCode {
-        StatusCode::INTERNAL_SERVER_ERROR
+        match self {
+            SignupError::InvalidPayload => StatusCode::BAD_REQUEST,
+            _ => StatusCode::INTERNAL_SERVER_ERROR,
+        }
     }
 
     fn error_response(&self) -> HttpResponse {
@@ -42,9 +47,14 @@ where
     SignupError: ResponseError,
 {
     fn from(value: &SignupError) -> Self {
+        let cause = match value {
+            SignupError::InvalidPayload => "required user_id and password".into(),
+            _ => ErrorResponse::default().cause,
+        };
+
         Self {
-            status_code: value.status_code().as_u16(),
-            message: ErrorResponse::default().message,
+            cause,
+            message: "Account creation failed".into(),
         }
     }
 }

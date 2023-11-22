@@ -1,9 +1,16 @@
 use crate::{
     configuration::{application::ApplicationSettings, auth::AuthSettings, Settings},
     database::Database,
+    domain::user::actions::{SigninError, SignupError},
+    error::ErrorResponse,
     routes::{private::private_services, public::public_services},
 };
-use actix_web::{dev::Server, web, App, HttpServer};
+use actix_web::{
+    dev::Server,
+    error::InternalError,
+    web::{self, JsonConfig},
+    App, HttpResponse, HttpServer,
+};
 use std::{fmt::Debug, net::TcpListener};
 
 /// A wrapper for the actix instance. It hides the details of the actix instance
@@ -54,12 +61,15 @@ impl Application {
     ) -> anyhow::Result<Server> {
         let db = web::Data::new(db);
         let auth_settings = web::Data::new(auth_settings);
+        let json_cfg = Self::init_json_config();
+
         let server = HttpServer::new(move || {
             App::new()
                 .configure(public_services)
                 .configure(private_services)
                 .app_data(db.clone())
                 .app_data(auth_settings.clone())
+                .app_data(json_cfg.clone())
         })
         .listen(listener)?
         .run();
@@ -75,5 +85,28 @@ impl Application {
     /// Start the application and run on an infinite loop.
     pub async fn run_until_stopped(self) -> Result<(), std::io::Error> {
         self.server.await
+    }
+
+    fn init_json_config() -> JsonConfig {
+        web::JsonConfig::default().error_handler(|err, req| {
+            let error = match err {
+                actix_web::error::JsonPayloadError::Deserialize(e) => {
+                    if req.path().ends_with("/signup") {
+                        println!("HERE");
+                        InternalError::from_response(
+                            e,
+                            HttpResponse::BadRequest()
+                                .json(ErrorResponse::from(&SignupError::InvalidPayload)),
+                        )
+                    } else {
+                        let message = e.to_string();
+                        InternalError::from_response(e, HttpResponse::BadRequest().json(message))
+                    }
+                }
+                _ => return err.into(),
+            };
+
+            error.into()
+        })
     }
 }

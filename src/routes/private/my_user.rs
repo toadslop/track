@@ -45,7 +45,7 @@ where
     user::actions::GetOneError: ResponseError,
 {
     fn from(value: &user::actions::GetOneError) -> Self {
-        let message = match value {
+        let cause = match value {
             user::actions::GetOneError::DatabaseError(_) => ErrorResponse::default().message,
             user::actions::GetOneError::NotFound(_) => {
                 "No data was found for the requested user".into()
@@ -53,8 +53,8 @@ where
         };
 
         Self {
-            status_code: value.status_code().as_u16(),
-            message,
+            cause,
+            message: "Failed to retrieve user information".into(),
         }
     }
 }

@@ -52,7 +52,7 @@ where
     user::actions::SigninError: ResponseError,
 {
     fn from(value: &user::actions::SigninError) -> Self {
-        let message = match value {
+        let cause = match value {
             user::actions::SigninError::UserNotFound => {
                 "User for submitted credentials does not exist".into()
             }
@@ -63,8 +63,8 @@ where
         };
 
         Self {
-            status_code: value.status_code().as_u16(),
-            message,
+            cause,
+            message: "Failed to signin user".into(),
         }
     }
 }
