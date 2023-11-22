@@ -61,6 +61,16 @@ pub fn hash_password(password: &Secret<String>) -> Result<String, password_hash:
 }
 
 #[derive(Debug, Error)]
+pub enum BasicAuthError {
+    #[error("Failed to hash password: {0}")]
+    PasswordHash(password_hash::Error),
+    #[error("User attempted to signin with invalid credentials: {0}")]
+    InvalidCredentials(argon2::password_hash::Error),
+    #[error("Failed to encode the jwt: {0}")]
+    JwtError(#[from] jsonwebtoken::errors::Error),
+}
+
+#[derive(Debug, Error)]
 pub enum JwtError {
     #[error("Failed to hash password: {0}")]
     PasswordHash(password_hash::Error),
