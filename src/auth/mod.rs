@@ -16,7 +16,10 @@ pub struct TokenClaims {
     pub exp: usize,
 }
 
-pub fn verify_jwt(password: &str, submitted_password: &Secret<String>) -> Result<(), JwtError> {
+pub fn verify_password(
+    password: &str,
+    submitted_password: &Secret<String>,
+) -> Result<(), JwtError> {
     tracing::debug!("Generating has from db user's password");
     let hash = PasswordHash::new(password).map_err(JwtError::PasswordHash)?;
     tracing::debug!("Success");

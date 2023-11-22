@@ -30,14 +30,15 @@ pub async fn signup(db: &Database, user_dto: &dto::Signup) -> Result<SignupRespo
     tracing::debug!("Inserting user into DB");
     sqlx::query(
         r#"
-        INSERT INTO user_ (id, user_id, password, created_at)
-        VALUES($1, $2, $3, $4)
+        INSERT INTO user_ (id, user_id, password, created_at, nickname)
+        VALUES($1, $2, $3, $4, $5)
     "#,
     )
     .bind(Uuid::new_v4())
     .bind(&user_dto.user_id)
     .bind(hashed_password)
     .bind(Utc::now())
+    .bind(&user_dto.user_id) // DEFAULT
     .execute(db.inner())
     .await?;
     tracing::debug!("Insert user success");

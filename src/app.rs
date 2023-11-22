@@ -65,8 +65,8 @@ impl Application {
 
         let server = HttpServer::new(move || {
             App::new()
-                .configure(public_services)
                 .configure(private_services)
+                .configure(public_services)
                 .app_data(db.clone())
                 .app_data(auth_settings.clone())
                 .app_data(json_cfg.clone())

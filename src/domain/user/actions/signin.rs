@@ -1,5 +1,5 @@
 use crate::{
-    auth::{issue_jwt, verify_jwt, JwtError},
+    auth::{issue_jwt, verify_password, JwtError},
     database::Database,
     domain::user::{dto, User},
 };
@@ -25,7 +25,7 @@ pub async fn signin(
         .ok_or(SigninError::UserNotFound)?;
     tracing::debug!("User found");
 
-    verify_jwt(&user.password, &user_info.password)?;
+    verify_password(&user.password, &user_info.password)?;
 
     let token = issue_jwt(&user.id, jwt_secret)?;
 

@@ -9,7 +9,7 @@ pub struct Signup {
     pub password: Secret<String>,
 }
 
-/// User submitted data for signing up
+/// Response format when user is requested
 #[derive(Debug, Serialize)]
 pub struct SignupResponse {
     pub user_id: String,
@@ -21,6 +21,25 @@ impl From<User> for SignupResponse {
         Self {
             user_id: value.user_id.clone(),
             nickname: value.user_id,
+        }
+    }
+}
+
+/// User submitted data for signing up
+#[derive(Debug, Serialize)]
+pub struct GetUserResponse {
+    pub user_id: String,
+    pub nickname: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub comment: Option<String>,
+}
+
+impl From<User> for GetUserResponse {
+    fn from(value: User) -> Self {
+        Self {
+            user_id: value.user_id.clone(),
+            nickname: value.user_id,
+            comment: value.comment,
         }
     }
 }
