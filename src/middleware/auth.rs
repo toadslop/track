@@ -3,6 +3,7 @@
 use crate::auth::{verify_password, TokenClaims};
 use crate::configuration::auth::AuthSettings;
 use crate::database::Database;
+use crate::domain;
 use crate::domain::user::User;
 use crate::error::ErrorResponse;
 use actix_web::dev::ServiceRequest;
@@ -177,6 +178,9 @@ pub async fn process_basic(
         tracing::error!("Password verification failed: {e}");
         return Err((AuthError::InvalidCredentials.into(), req));
     }
+
+    req.extensions_mut()
+        .insert::<domain::user::BasicId>(credentials.user_id().into());
 
     Ok(req)
 }

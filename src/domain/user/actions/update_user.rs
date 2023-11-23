@@ -1,3 +1,5 @@
+use thiserror::Error;
+
 use crate::{
     database::Database,
     domain::user::{
@@ -13,7 +15,7 @@ pub async fn update_user(
     db: &Database,
     user_id: &str,
     update_user: &UpdateUserDto,
-) -> Result<GetUserResponse, GetOneError> {
+) -> Result<GetUserResponse, UpdateError> {
     tracing::debug!("Updating user: {:?}", update_user);
     let user = sqlx::query_as::<_, User>(
         r#"
@@ -59,25 +61,17 @@ pub async fn get_one_by_str_id(
     Ok(user.into())
 }
 
-// #[derive(Debug, Error)]
-// pub enum GetOneError {
-//     #[error("An error occurred with the database when requesting a single user: {0}")]
-//     DatabaseError(#[from] sqlx::Error),
-//     #[error("A user with the id '{0}' was not found")]
-//     NotFound(UserIdType),
-// }
-
-// #[derive(Debug)]
-// pub enum UserIdType {
-//     Uuid(Uuid),
-//     Str(String),
-// }
-
-// impl Display for UserIdType {
-//     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-//         match self {
-//             UserIdType::Uuid(id) => write!(f, "{id}"),
-//             UserIdType::Str(id) => write!(f, "{id}"),
-//         }
-//     }
-// }
+#[derive(Debug, Error)]
+pub enum UpdateError {
+    #[error("An error occurred with the database when requesting a single user: {0}")]
+    DatabaseError(#[from] sqlx::Error),
+    #[error("An error occurred when retrieving a user from the database: {0}")]
+    GetOneError(#[from] GetOneError),
+    #[error(
+        "A user with the id '{requester}' does not have permission to update user '{requested}'"
+    )]
+    Forbidden {
+        requester: String,
+        requested: String,
+    },
+}

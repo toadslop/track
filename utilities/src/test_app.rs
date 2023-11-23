@@ -108,6 +108,21 @@ impl TestApp {
         Ok(res)
     }
 
+    pub async fn close_account(
+        &self,
+        credentials: Option<Basic>,
+    ) -> anyhow::Result<reqwest::Response> {
+        let mut req = self.client.post(self.app_address.join("/close")?);
+
+        if let Some(credentials) = credentials {
+            req = Self::add_auth(req, credentials);
+        }
+
+        let res = req.send().await?;
+
+        Ok(res)
+    }
+
     pub async fn base_url(&self) -> anyhow::Result<reqwest::Response> {
         let res = self.client.post(self.app_address.join("/")?).send().await?;
 
