@@ -79,7 +79,7 @@ pub async fn init(settings: &DatabaseSettings) -> Result<Database, DatabaseInitE
     tracing::info!("Migrations success");
     let db: Database = Database::from(db);
 
-    signup(
+    match signup(
         &db,
         Signup {
             user_id: Some("TaroYamada".into()),
@@ -87,7 +87,10 @@ pub async fn init(settings: &DatabaseSettings) -> Result<Database, DatabaseInitE
         },
     )
     .await
-    .expect("Failed to create test user");
+    {
+        Ok(_) => tracing::info!("Created test user"),
+        Err(_) => tracing::warn!("Test user already exists"),
+    };
 
     Ok(db)
 }
