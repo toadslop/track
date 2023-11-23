@@ -67,9 +67,9 @@ async fn can_update_user_information() -> anyhow::Result<()> {
     let fixed_password = &password[1..(password.len() - 1)];
 
     let mut nickname = format!("{} {}", BsAdj().fake::<String>(), BsNoun().fake::<String>());
-    nickname.truncate(20);
+    nickname.truncate(19);
     let mut comment = CatchPhase().fake::<String>();
-    comment.truncate(30);
+    comment.truncate(29);
 
     let new_details = json!({
         "nickname": nickname,

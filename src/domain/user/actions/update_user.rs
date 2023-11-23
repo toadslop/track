@@ -9,6 +9,8 @@ use crate::{
     },
 };
 
+use super::signup::UserId;
+
 /// Action for retrieving a single user by it's ID.
 #[tracing::instrument]
 pub async fn update_user(
@@ -17,6 +19,18 @@ pub async fn update_user(
     update_user: &UpdateUserDto,
 ) -> Result<GetUserResponse, UpdateError> {
     tracing::debug!("Updating user: {:?}", update_user);
+
+    let update_user: ValidUpdate = update_user.try_into()?;
+    let nickname = update_user
+        .nickname
+        .as_ref()
+        .map(|nickname| Some(nickname.as_ref()));
+
+    let comment = update_user
+        .comment
+        .as_ref()
+        .map(|comment| Some(comment.as_ref()));
+
     let user = sqlx::query_as::<_, User>(
         r#"
         UPDATE user_
@@ -27,8 +41,8 @@ pub async fn update_user(
             RETURNING user_id, nickname, comment, password, id;
     "#,
     )
-    .bind(&update_user.nickname)
-    .bind(&update_user.comment)
+    .bind(nickname)
+    .bind(comment)
     .bind(user_id)
     .fetch_one(db.inner())
     .await?;
@@ -74,4 +88,73 @@ pub enum UpdateError {
         requester: String,
         requested: String,
     },
+    #[error("Value for field '{field}' is invalid: '{reason}'")]
+    Validation { field: String, reason: String },
+}
+
+type Nickname = UserId;
+
+#[derive(Debug)]
+pub struct ValidUpdate {
+    comment: Option<Comment>,
+    nickname: Option<Nickname>,
+}
+
+impl TryFrom<&UpdateUserDto> for ValidUpdate {
+    type Error = UpdateError;
+
+    fn try_from(value: &UpdateUserDto) -> Result<Self, Self::Error> {
+        let comment: Option<Comment> = match &value.comment {
+            Some(id) => Some(id.to_owned().try_into()?),
+            None => None,
+        };
+
+        let nickname = match &value.nickname {
+            Some(nickname) => {
+                Some(
+                    nickname
+                        .to_owned()
+                        .try_into()
+                        .map_err(|_| UpdateError::Validation {
+                            field: "comment".into(),
+                            reason: format!(
+                                "Field must be less than or equal to{}",
+                                Comment::MAX_LENGTH
+                            ),
+                        })?,
+                )
+            }
+            None => None,
+        };
+
+        Ok(Self { comment, nickname })
+    }
+}
+
+#[derive(Debug)]
+pub struct Comment(String);
+
+impl Comment {
+    const MAX_LENGTH: usize = 30;
+}
+
+impl TryFrom<String> for Comment {
+    type Error = UpdateError;
+
+    fn try_from(value: String) -> Result<Self, Self::Error> {
+        if value.len() >= Self::MAX_LENGTH {
+            return Err(UpdateError::Validation {
+                field: "comment".into(),
+                reason: format!("must be less or equal to {}", Self::MAX_LENGTH),
+            });
+        }
+
+        Ok(Self(value))
+    }
+}
+
+impl AsRef<str> for Comment {
+    fn as_ref(&self) -> &str {
+        self.0.as_ref()
+    }
 }

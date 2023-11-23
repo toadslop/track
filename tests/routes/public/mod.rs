@@ -1,7 +1,6 @@
 use utilities::spawn::spawn_app;
 
 mod health;
-mod signin;
 mod signup;
 
 #[actix_web::test]

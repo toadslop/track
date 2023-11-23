@@ -30,6 +30,7 @@ impl ResponseError for SignupError {
     fn status_code(&self) -> StatusCode {
         match self {
             SignupError::InvalidPayload => StatusCode::BAD_REQUEST,
+            SignupError::Validation { .. } => StatusCode::BAD_REQUEST,
             _ => StatusCode::INTERNAL_SERVER_ERROR,
         }
     }
@@ -50,6 +51,9 @@ where
         let cause = match value {
             SignupError::InvalidPayload => Some("required user_id and password".into()),
             SignupError::UserAlreadyExists(..) => Some("already same user_id is used".into()),
+            SignupError::Validation { field, reason } => {
+                Some(format!("Submission for field {field} is invalid: {reason}"))
+            }
             _ => ErrorResponse::default().cause,
         };
 

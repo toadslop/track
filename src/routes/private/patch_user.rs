@@ -41,6 +41,7 @@ impl ResponseError for user::actions::UpdateError {
             user::actions::UpdateError::DatabaseError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             user::actions::UpdateError::GetOneError(e) => e.status_code(),
             user::actions::UpdateError::Forbidden { .. } => StatusCode::FORBIDDEN,
+            user::actions::UpdateError::Validation { .. } => StatusCode::BAD_REQUEST,
         }
     }
 
@@ -61,6 +62,9 @@ where
             user::actions::UpdateError::DatabaseError(_) => Some(ErrorResponse::default().message),
             user::actions::UpdateError::GetOneError(e) => Some(e.to_string()),
             user::actions::UpdateError::Forbidden { .. } => Some("Unauthorized".into()),
+            user::actions::UpdateError::Validation { field, reason } => {
+                Some(format!("Submission for field {field} is invalid: {reason}"))
+            }
         };
 
         let message = match value {

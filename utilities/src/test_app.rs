@@ -49,6 +49,17 @@ impl TestApp {
         Ok(res)
     }
 
+    pub async fn signup_owned(&self, data: serde_json::Value) -> anyhow::Result<reqwest::Response> {
+        let res = self
+            .client
+            .post(self.app_address.join("/signup")?)
+            .json(&data)
+            .send()
+            .await?;
+
+        Ok(res)
+    }
+
     pub async fn signin(&self, data: &serde_json::Value) -> anyhow::Result<reqwest::Response> {
         let res = self
             .client

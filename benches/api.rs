@@ -19,7 +19,7 @@ pub fn criterion_benchmark(c: &mut Criterion) {
 
     c.bench_function("signup", |b| {
         b.to_async(&runtime)
-            .iter(|| test_app.signup(gen_dummy_user()));
+            .iter(|| test_app.signup_owned(gen_dummy_user()));
     });
 }
 
