@@ -71,6 +71,7 @@ criterion = { version = "0.5.1", default-features = false, features = [
     "async_tokio",
 ] }
 utilities = { path = "utilities" }
+fake = "2.9.1"
 
 [[bench]]
 name = "api"

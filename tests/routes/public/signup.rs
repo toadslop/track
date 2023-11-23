@@ -10,7 +10,7 @@ async fn signup_returns_200_for_valid_data() -> anyhow::Result<()> {
     let user_data = gen_dummy_user();
 
     // Act
-    let resp = test_app.signup(user_data.clone()).await?;
+    let resp = test_app.signup(&user_data).await?;
 
     // Assert
     assert_eq!(
@@ -41,7 +41,7 @@ async fn cannot_sign_up_account_without_user_id_and_password() -> anyhow::Result
     let test_app = spawn_app().await?;
 
     // Act
-    let resp = test_app.signup(json!({})).await?;
+    let resp = test_app.signup(&json!({})).await?;
     let status = resp.status();
     let body = resp
         .json::<serde_json::Value>()
@@ -82,7 +82,7 @@ async fn can_create_an_account() -> anyhow::Result<()> {
     let user_data = gen_dummy_user();
 
     // Act
-    let resp = test_app.signup(user_data).await?;
+    let resp = test_app.signup(&user_data).await?;
     let status = resp.status();
     let body = resp
         .json::<serde_json::Value>()

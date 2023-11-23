@@ -19,8 +19,7 @@ pub async fn patch_user(
         }
         Err(e) => {
             tracing::error!("Request failure: {e}");
-            todo!();
-            // return Err(e);
+            return Err(e);
         }
     }
 }

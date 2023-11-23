@@ -61,7 +61,7 @@ pub enum AuthError {
     MissingConfig,
     #[error("Token is invalid")]
     InvalidToken(#[from] jsonwebtoken::errors::Error),
-    #[error("Token is invalid")]
+    #[error("Invalid credentials provided")]
     InvalidCredentials,
     #[error("Encountered an error in the database: {0}")]
     DatabaseError(#[from] sqlx::Error),
@@ -114,6 +114,8 @@ pub async fn process_basic(
     credentials: Option<BasicAuth>,
 ) -> Result<ServiceRequest, (actix_web::Error, ServiceRequest)> {
     tracing::info!("Requesting signin with basic auth");
+
+    tracing::debug!("Loading database from app data...");
     let db = match req.extract::<web::Data<Database>>().await.map_err(|e| {
         let error: AuthError = AuthError::DatabaseExtractFailure(e);
         tracing::error!("{}", &error);
@@ -122,12 +124,16 @@ pub async fn process_basic(
         Ok(db) => db,
         Err(e) => return Err((e.into(), req)),
     };
+    tracing::debug!("Database found.");
 
+    tracing::debug!("Extracting credentials...");
     let credentials = match credentials {
         Some(credentials) => credentials,
         None => return Err((AuthError::InvalidCredentials.into(), req)),
     };
+    tracing::debug!("Success");
 
+    tracing::debug!("Looking up user data...");
     let user = match sqlx::query_as::<_, User>(
         r#"
         SELECT * FROM user_ WHERE user_id = $1
@@ -144,17 +150,28 @@ pub async fn process_basic(
             return Err((e.into(), req));
         }
     };
+    tracing::debug!("Request to db succeeded");
 
+    tracing::debug!("Checking if user was found...");
     let user = match user.ok_or(AuthError::InvalidCredentials) {
         Ok(user) => user,
-        Err(e) => return Err((e.into(), req)),
+        Err(e) => {
+            tracing::error!("User was not found: {e}");
+            return Err((e.into(), req));
+        }
     };
+    tracing::debug!("User found.");
 
+    tracing::debug!("Extracting password from credentials...");
     let submitted_password = match credentials.password() {
         Some(credentials) => credentials,
-        None => return Err((AuthError::InvalidCredentials.into(), req)),
+        None => {
+            tracing::error!("Password was not found");
+            return Err((AuthError::InvalidCredentials.into(), req));
+        }
     }
     .into();
+    tracing::debug!("Password found");
 
     if let Err(e) = verify_password(&user.password, &Secret::new(submitted_password)) {
         tracing::error!("Password verification failed: {e}");
