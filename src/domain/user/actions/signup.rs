@@ -13,42 +13,45 @@ use uuid::Uuid;
 
 /// Performs the necessary procedures required for signing up a new user.
 #[tracing::instrument]
-pub async fn signup(db: &Database, user_dto: &dto::Signup) -> Result<SignupResponse, SignupError> {
+pub async fn signup(db: &Database, user_dto: dto::Signup) -> Result<SignupResponse, SignupError> {
+    tracing::debug!("Validating request integrity...");
+    let (password, user_id) = match (user_dto.password, user_dto.user_id) {
+        (Some(password), Some(user_id)) => (password, user_id),
+        _ => Err(SignupError::InvalidPayload)?,
+    };
+    tracing::debug!("Request contains required fields");
+
+    tracing::debug!("Checking if user already exists...");
     let user = sqlx::query_as::<_, User>("SELECT * FROM user_ WHERE user_id = $1")
-        .bind(&user_dto.user_id)
+        .bind(&user_id)
         .fetch_optional(db.inner())
         .await?;
 
     if user.is_some() {
-        return Err(SignupError::UserAlreadyExists(user_dto.user_id.clone()));
+        Err(SignupError::UserAlreadyExists(user_id.to_owned()))?;
     }
+    tracing::debug!("User does not exist");
 
     tracing::debug!("Hashing password");
-    let hashed_password = hash_password(&user_dto.password).map_err(SignupError::PasswordHash)?;
+    let hashed_password = hash_password(&password).map_err(SignupError::PasswordHash)?;
     tracing::debug!("Password hash success");
 
     tracing::debug!("Inserting user into DB");
-    sqlx::query(
+    let user = sqlx::query_as::<_, User>(
         r#"
         INSERT INTO user_ (id, user_id, password, created_at, nickname)
         VALUES($1, $2, $3, $4, $5)
+        RETURNING user_id, nickname, id, password;
     "#,
     )
     .bind(Uuid::new_v4())
-    .bind(&user_dto.user_id)
+    .bind(&user_id)
     .bind(hashed_password)
     .bind(Utc::now())
-    .bind(&user_dto.user_id) // DEFAULT
-    .execute(db.inner())
+    .bind(&user_id) // DEFAULT
+    .fetch_one(db.inner())
     .await?;
     tracing::debug!("Insert user success");
-
-    tracing::debug!("Retrieving user info from DB");
-    let user = sqlx::query_as::<_, User>("SELECT * FROM user_ WHERE user_id = $1")
-        .bind(&user_dto.user_id)
-        .fetch_one(db.inner())
-        .await?;
-    tracing::debug!("Retrieval success");
 
     Ok(user.into())
 }

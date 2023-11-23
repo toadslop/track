@@ -5,8 +5,8 @@ use serde::{Deserialize, Serialize};
 /// User submitted data for signing up
 #[derive(Debug, Deserialize)]
 pub struct Signup {
-    pub user_id: String,
-    pub password: Secret<String>,
+    pub user_id: Option<String>,
+    pub password: Option<Secret<String>>,
 }
 
 /// Response format when user is requested

@@ -81,9 +81,9 @@ pub async fn init(settings: &DatabaseSettings) -> Result<Database, DatabaseInitE
 
     signup(
         &db,
-        &Signup {
-            user_id: "TaroYamada".into(),
-            password: Secret::new("PaSSwd4TY".into()),
+        Signup {
+            user_id: Some("TaroYamada".into()),
+            password: Some(Secret::new("PaSSwd4TY".into())),
         },
     )
     .await

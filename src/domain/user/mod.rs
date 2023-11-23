@@ -11,8 +11,10 @@ pub struct User {
     pub password: String,
     pub id: Uuid,
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[sqlx(default)]
     pub nickname: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[sqlx(default)]
     pub comment: Option<String>,
 }
 

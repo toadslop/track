@@ -12,7 +12,7 @@ pub async fn signup(
 ) -> Result<HttpResponse, SignupError> {
     tracing::info!("Signup requested: {user_data:?}");
 
-    match user::actions::signup(&db, &user_data.into_inner()).await {
+    match user::actions::signup(&db, user_data.into_inner()).await {
         Ok(user) => {
             tracing::info!("Signup success: {user:?}");
 
